@@ -7,7 +7,7 @@ import {
   PlayCircle,
   RotateCcw,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ContinueTransferDialog } from "../components/transfer/ContinueTransferDialog";
 
@@ -82,6 +82,13 @@ export function DemoScenariosPage() {
             Open current transfer
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </button>
+          <Link
+            to="/about"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            How TransferShield works
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Link>
           </div>
         </header>
 

@@ -105,13 +105,23 @@ export function StartTransferPage() {
           </h1>
         </div>
 
+       
+       <div className="flex items-center gap-2">
+        <Link
+          to="/about"
+          className="inline-flex min-h-10 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+        >
+          How it works
+        </Link>
+
         <Link
           to="/demo"
           className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white"
         >
           Demo scenarios
         </Link>
-      </header>
+      </div>
+            </header>
 
       <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">

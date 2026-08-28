@@ -73,6 +73,36 @@ export function getActionRequired(transfer: Transfer): ActionRequired {
     };
   }
 
+  const buyerDetailsTask = transfer.tasks.find(
+  (task) => task.id === "buyer-confirm-details",
+);
+
+const sellerDetailsTask = transfer.tasks.find(
+  (task) => task.id === "seller-confirm-details",
+);
+
+if (transfer.status === "BUYER_JOINED") {
+  if (buyerDetailsTask?.status !== "completed") {
+    return {
+      role: "buyer",
+      title: "Buyer needs to confirm details",
+      description:
+        "The buyer must review and confirm their transfer details before payment can begin.",
+      actionLabel: "Confirm details",
+    };
+  }
+
+  if (sellerDetailsTask?.status !== "completed") {
+    return {
+      role: "seller",
+      title: "Seller needs to confirm details",
+      description:
+        "The seller must review and confirm their transfer details before payment can begin.",
+      actionLabel: "Confirm details",
+    };
+  }
+}
+
   const actions: Record<TransferStatus, ActionRequired> = {
     INITIATED: {
       role: "seller",
@@ -89,12 +119,12 @@ export function getActionRequired(transfer: Transfer): ActionRequired {
       actionLabel: "Join transfer",
     },
     BUYER_JOINED: {
-      role: "shared",
-      title: "Complete transfer details",
-      description:
-        "Seller and buyer should check and complete their respective details.",
-      actionLabel: "Complete details",
-    },
+        role: "shared",
+        title: "Confirm transfer details",
+        description:
+          "Both the buyer and seller must confirm their details before payment can begin.",
+        actionLabel: "Confirm details",
+      },
     DETAILS_COMPLETED: {
       role: "shared",
       title: "Upload required documents",
@@ -144,11 +174,11 @@ export function getActionRequired(transfer: Transfer): ActionRequired {
   actionLabel: "Review submission",
 },
     READY_FOR_RTO: {
-      role: "rto",
-      title: "Application ready for RTO review",
+      role: "shared",
+      title: "Submit application to RTO",
       description:
-        "All required actions are complete. The RTO can now review the application.",
-      actionLabel: "Open RTO review",
+        "Both parties have completed their required steps. Submit the application to begin RTO review.",
+      actionLabel: "Submit to RTO",
     },
     RTO_PROCESSING: {
       role: "rto",

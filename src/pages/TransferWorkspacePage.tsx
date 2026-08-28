@@ -14,6 +14,7 @@ import { InviteBuyerDialog } from "../components/transfer/InviteBuyerDialog";
 import { TransferDetailsDialog } from "../components/transfer/TransferDetailsDialog";
 import { MockPaymentDialog } from "../components/transfer/MockPaymentDialog";
 import { FinalReviewDialog } from "../components/transfer/FinalReviewDialog";
+import { getActionRequired } from "../utils/workflow";
 
 export function TransferWorkspacePage() {
   const transfer = useTransferStore((state) => state.transfer);
@@ -209,6 +210,8 @@ const confirmFinalReview = useTransferStore(
     ? "Verify mock OTP and submit"
     : "Send mock Aadhaar OTP";
 
+    const currentAction = getActionRequired(transfer);
+
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -220,10 +223,18 @@ const confirmFinalReview = useTransferStore(
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
               Vehicle ownership transfer
             </h1>
-            <p className="mt-2 text-sm text-slate-600">
-              Application ID:{" "}
-              <span className="font-semibold text-slate-900">{transfer.id}</span>
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <p className="text-sm text-slate-600">
+                Application ID:{" "}
+                <span className="font-semibold text-slate-900">
+                  {transfer.id}
+                </span>
+              </p>
+
+              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                {currentAction.title}
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-col items-start gap-3 sm:items-end">
@@ -235,6 +246,12 @@ const confirmFinalReview = useTransferStore(
             </div>
 
             <div className="flex flex-wrap gap-2">
+              <Link
+                to="/about"
+                className="inline-flex min-h-10 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100"
+              >
+                How it works
+              </Link>
               <Link
                 to="/demo"
                 className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white"

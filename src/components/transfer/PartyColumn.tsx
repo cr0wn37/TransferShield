@@ -42,6 +42,20 @@ export function PartyColumn({
 
   const isActive = activeDemoRole === role;
 
+  const visibleTasks = tasks.map((task) => ({
+  task,
+  status: getDerivedTaskStatus(transfer, task.id),
+}));
+
+const hasPendingTask = visibleTasks.some(
+  ({ status }) => status === "pending" || status === "blocked",
+);
+
+const isWaitingForOtherParty =
+  !hasPendingTask &&
+  visibleTasks.some(({ status }) => status === "completed") &&
+  transfer.status !== "TRANSFER_COMPLETED";
+
   return (
     <section
       className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition ${
@@ -72,12 +86,18 @@ export function PartyColumn({
         </p>
       ) : null}
 
+      {isWaitingForOtherParty ? (
+        <p className="bg-emerald-50 px-5 py-2 text-xs font-medium text-emerald-700">
+          Your current tasks are complete. Waiting for the other party.
+        </p>
+      ) : null}
+
       <div className="space-y-3 p-4">
-        {tasks.map((task) => (
+        {visibleTasks.map(({ task, status }) => (
           <TaskCard
             key={task.id}
             task={task}
-            status={getDerivedTaskStatus(transfer, task.id)}
+            status={status}
             onAction={
               onTaskAction ? () => onTaskAction(task) : undefined
             }

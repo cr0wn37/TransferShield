@@ -335,14 +335,7 @@ updatedTransfer = updateTask(
   confirmPartyDetails: (role) => {
   const { transfer } = get();
 
-  if (
-    ![
-      "BUYER_JOINED",
-      "PAYMENT_PENDING",
-      "BUYER_ESIGN_PENDING",
-      "SELLER_ESIGN_PENDING",
-    ].includes(transfer.status)
-  ) {
+  if (transfer.status !== "BUYER_JOINED") {
     return;
   }
 
@@ -369,7 +362,10 @@ updatedTransfer = updateTask(
     status: "success",
   });
 
-  if (role === "buyer" && transfer.status === "BUYER_JOINED") {
+  if (
+    updatedTransfer.buyer.detailsConfirmedAt &&
+    updatedTransfer.seller.detailsConfirmedAt
+  ) {
     updatedTransfer = {
       ...updatedTransfer,
       status: "PAYMENT_PENDING",
@@ -382,10 +378,10 @@ updatedTransfer = updateTask(
     );
 
     updatedTransfer = addEvent(updatedTransfer, {
-      title: "Buyer details confirmed",
+      title: "Transfer details confirmed by both parties",
       description:
-        "Buyer details have been confirmed. Payment can now continue.",
-      actor: "buyer",
+        "Seller and buyer have both confirmed their details. Payment can now continue.",
+      actor: "shared",
       status: "success",
     });
   }

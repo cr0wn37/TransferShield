@@ -75,8 +75,9 @@ export const initialTransfer: Transfer = {
   owner: "buyer",
   status: "locked",
   prerequisiteTaskIds: [
-    "buyer-confirm-details",
-  ],
+  "seller-confirm-details",
+  "buyer-confirm-details",
+],
   actionLabel: "Pay now",
 },
     {
