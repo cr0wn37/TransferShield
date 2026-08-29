@@ -231,4 +231,9 @@ export const initialTransfer: Transfer = {
       status: "success",
     },
   ],
+  transferDeadline: {
+  type: "same_state",
+  days: 14,
+  startsAt: "2026-08-25T10:00:00+05:30",
+},
 };

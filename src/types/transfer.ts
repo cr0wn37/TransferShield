@@ -152,4 +152,10 @@ export interface Transfer {
   eSign: ESign;
   rto: RtoReview;
   timeline: TimelineEvent[];
+
+  transferDeadline: {
+    type: "same_state" | "interstate";
+    days: 14 | 45;
+    startsAt: string;
+  };
 }

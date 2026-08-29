@@ -151,6 +151,11 @@ createTransfer: (registrationNumber, chassisLast5) => {
   ).slice(-6)}`;
   newTransfer.createdAt = now;
   newTransfer.updatedAt = now;
+  newTransfer.transferDeadline = {
+  type: "same_state",
+  days: 14,
+  startsAt: now,
+};
   newTransfer.vehicle.registrationNumber = normalizedRegistrationNumber;
   newTransfer.vehicle.chassisLast5 = chassisLast5;
   newTransfer.timeline = [
@@ -487,6 +492,22 @@ updatedTransfer = updateTask(
       ),
     };
 
+    if (transfer.status === "ACTION_REQUIRED") {
+  const allDocumentsValid = updatedTransfer.documents.every(
+    (document) => document.status === "valid",
+  );
+
+  if (allDocumentsValid) {
+    updatedTransfer = {
+      ...updatedTransfer,
+      rto: {
+        ...updatedTransfer.rto,
+        status: "action_required",
+      },
+    };
+  }
+}
+
     updatedTransfer = addEvent(updatedTransfer, {
       title:
         validationStatus === "valid"
@@ -705,13 +726,17 @@ updatedTransfer = updateTask(
   resubmitToRto: () => {
     const { transfer } = get();
 
-    const allDocumentsValid = transfer.documents.every(
-      (document) => document.status === "valid",
-    );
+    if (transfer.status !== "ACTION_REQUIRED") {
+  return;
+}
 
-    if (transfer.status !== "ACTION_REQUIRED" || !allDocumentsValid) {
-      return;
-    }
+const allDocumentsValid = transfer.documents.every(
+  (document) => document.status === "valid",
+);
+
+if (!allDocumentsValid) {
+  return;
+}
 
     const updatedTransfer = addEvent(
       {

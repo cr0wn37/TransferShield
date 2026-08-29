@@ -15,6 +15,7 @@ import { TransferDetailsDialog } from "../components/transfer/TransferDetailsDia
 import { MockPaymentDialog } from "../components/transfer/MockPaymentDialog";
 import { FinalReviewDialog } from "../components/transfer/FinalReviewDialog";
 import { getActionRequired } from "../utils/workflow";
+import { TransferDeadline } from "../components/transfer/TransferDeadline";
 
 export function TransferWorkspacePage() {
   const transfer = useTransferStore((state) => state.transfer);
@@ -73,11 +74,15 @@ const [isFinalReviewDialogOpen, setIsFinalReviewDialogOpen] =
   );
 
   const activeESignStage =
-    transfer.status === "BUYER_ESIGN_PENDING"
-      ? "BUYER_ESIGN_PENDING"
-      : transfer.status === "SELLER_ESIGN_PENDING"
-        ? "SELLER_ESIGN_PENDING"
-        : correctionDocument?.requiredAt;
+  transfer.status === "BUYER_ESIGN_PENDING"
+    ? "BUYER_ESIGN_PENDING"
+    : transfer.status === "SELLER_ESIGN_PENDING"
+      ? "SELLER_ESIGN_PENDING"
+      : transfer.status === "ACTION_REQUIRED" && correctionDocument
+        ? correctionDocument.owner === "buyer"
+          ? "BUYER_ESIGN_PENDING"
+          : "SELLER_ESIGN_PENDING"
+        : null;
 
   const activeDocuments = activeESignStage
     ? transfer.documents.filter(
@@ -174,12 +179,19 @@ case "seller-final-review":
   };
 
   const handleESignAction = () => {
-  if (!activeESignStage || !areActiveDocumentsValid) {
+  if (isCorrectionMode) {
+    const allDocumentsValid = transfer.documents.every(
+      (document) => document.status === "valid",
+    );
+
+    if (allDocumentsValid) {
+      resubmitToRto();
+    }
+
     return;
   }
 
-  if (isCorrectionMode) {
-    resubmitToRto();
+  if (!activeESignStage || !areActiveDocumentsValid) {
     return;
   }
 
@@ -272,6 +284,9 @@ const confirmFinalReview = useTransferStore(
         <div className="space-y-6">
           <ProgressTracker status={transfer.status} />
 
+          <TransferDeadline transfer={transfer} />
+
+
           <ActionRequiredCard
             transfer={transfer}
             onAction={handlePrimaryAction}
@@ -282,51 +297,110 @@ const confirmFinalReview = useTransferStore(
               id="esign-package"
               className="scroll-mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 sm:p-6"
             >
-              <DocumentChecklist
-                documents={transfer.documents}
-                stage={activeESignStage}
-                onUpload={(documentId, fileName) =>
-                  uploadDocument(documentId, fileName)
-                }
-                isCompleted={
-                  activeESignStage === "BUYER_ESIGN_PENDING"
-                    ? transfer.eSign.buyer === "completed"
-                    : transfer.eSign.seller === "completed"
-                }
-              />
-
-              {!(
-                (isBuyerESign && transfer.eSign.buyer === "completed") ||
-                (!isBuyerESign && transfer.eSign.seller === "completed")
-              ) ? (
-                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-blue-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+              {isCorrectionMode ? (
+                <>
                   <div>
-                    <p className="font-semibold text-slate-900">
-                      {isBuyerESign ? "Buyer" : "Seller"} mock Aadhaar e-sign
+                    <p className="text-sm font-semibold text-amber-800">
+                      RTO correction required
                     </p>
 
-                    <p className="mt-1 text-sm text-slate-600">
-                      {!areActiveDocumentsValid
-                        ? "Upload and validate every required document before continuing."
-                        : isCorrectionMode
-                          ? "The requested correction is ready. Resubmit it for RTO review."
-                          : eSignStatus === "otp_sent"
-                            ? "Mock OTP sent. Complete e-sign to submit this package."
-                            : "Your documents are ready for mock OTP verification."}
+                    <h2 className="mt-1 text-lg font-semibold text-slate-900">
+                      {correctionDocument?.label ?? "Document correction"}
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-slate-700">
+                      {correctionDocument?.issueMessage ??
+                        transfer.rto.message ??
+                        "Please correct the requested document and resubmit the application."}
                     </p>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-amber-200 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Responsible party
+                    </p>
+
+                    <p className="mt-1 text-sm font-semibold text-slate-900">
+                      {transfer.rto.responsibleParty === "buyer"
+                        ? "Buyer"
+                        : transfer.rto.responsibleParty === "seller"
+                          ? "Seller"
+                          : "Shared"}
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <DocumentChecklist
+                      documents={transfer.documents}
+                      stage={activeESignStage}
+                      onUpload={(documentId, fileName) =>
+                        uploadDocument(documentId, fileName)
+                      }
+                      isCompleted={false}
+                    />
                   </div>
 
                   <button
                     type="button"
-                    disabled={!areActiveDocumentsValid}
-                    onClick={handleESignAction}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    disabled={
+                      !transfer.documents.every(
+                        (document) => document.status === "valid",
+                      )
+                    }
+                    onClick={resubmitToRto}
+                    className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:bg-slate-300"
                   >
                     <ShieldCheck aria-hidden="true" className="h-4 w-4" />
-                    {eSignButtonLabel}
+                    Resubmit to RTO
                   </button>
-                </div>
-              ) : null}
+                </>
+              ) : (
+                <>
+                  <DocumentChecklist
+                    documents={transfer.documents}
+                    stage={activeESignStage}
+                    onUpload={(documentId, fileName) =>
+                      uploadDocument(documentId, fileName)
+                    }
+                    isCompleted={
+                      activeESignStage === "BUYER_ESIGN_PENDING"
+                        ? transfer.eSign.buyer === "completed"
+                        : transfer.eSign.seller === "completed"
+                    }
+                  />
+
+                  {!(
+                    (isBuyerESign && transfer.eSign.buyer === "completed") ||
+                    (!isBuyerESign && transfer.eSign.seller === "completed")
+                  ) ? (
+                    <div className="mt-4 flex flex-col gap-3 rounded-xl border border-blue-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {isBuyerESign ? "Buyer" : "Seller"} mock Aadhaar e-sign
+                        </p>
+
+                        <p className="mt-1 text-sm text-slate-600">
+                          {!areActiveDocumentsValid
+                            ? "Upload and validate every required document before continuing."
+                            : eSignStatus === "otp_sent"
+                              ? "Mock OTP sent. Complete e-sign to submit this package."
+                              : "Your documents are ready for mock OTP verification."}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={!areActiveDocumentsValid}
+                        onClick={handleESignAction}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      >
+                        <ShieldCheck aria-hidden="true" className="h-4 w-4" />
+                        {eSignButtonLabel}
+                      </button>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </section>
           ) : null}
 
