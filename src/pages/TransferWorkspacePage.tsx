@@ -17,9 +17,8 @@ import { getActionRequired } from "../utils/workflow";
 import { TransferDeadline } from "../components/transfer/TransferDeadline";
 import { DigitalHandoverCard } from '../components/transfer/DigitalHandoverCard';
 import { LiveSyncCard } from "../components/transfer/LiveSyncCard";
-import { SlaClockCard } from "../components/transfer/SlaClockCard";
-import { SlaActionAlert } from "../components/transfer/SlaActionAlert";
-import { useLanguage } from "../context/LanguageContext";
+
+
 import { PhysicalRtoDocket } from "../components/PhysicalRtoDocket";
 
 
@@ -30,7 +29,7 @@ export function TransferWorkspacePage() {
   const inviteBuyer = useTransferStore((state) => state.inviteBuyer);
   const joinTransfer = useTransferStore((state) => state.joinTransfer);
 
-  const { t } = useLanguage();
+ 
   
   const updatePartyDetails = useTransferStore(
     (state) => state.updatePartyDetails,
@@ -80,8 +79,7 @@ const openCorrections =
       correction.status === "open",
   ) ?? [];
 
-const hasOpenCorrections =
-  openCorrections.length > 0;
+
 
 const correctionsResolved =
   transfer.status === "ACTION_REQUIRED" &&
@@ -387,8 +385,7 @@ const confirmFinalReview = useTransferStore(
       }
     : getActionRequired(transfer);
 
-    const canActOnDocument = (documentOwner: "seller" | "buyer") =>
-  !liveSync.enabled || liveSync.role === documentOwner;
+    
 
   return (
   <main className="min-h-screen bg-[#f8f1e8] px-4 py-5 sm:px-6 lg:px-8">
