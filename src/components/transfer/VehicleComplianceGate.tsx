@@ -86,13 +86,13 @@ export default function VehicleComplianceGate({
 
   const { t } = useLanguage();
 
-const [paymentResult, setPaymentResult] =
+const [, setPaymentResult] =
   useState<MockPaymentResult | null>(null);
 
   const [financierIssue, setFinancierIssue] =
   useState<ComplianceIssue | null>(null);
 
-const [financierResult, setFinancierResult] =
+const [, setFinancierResult] =
   useState<FinancierClearanceResult | null>(null);
 
   const [resolvedIssues, setResolvedIssues] = useState<
@@ -103,7 +103,7 @@ const [financierResult, setFinancierResult] =
     string | null
   >(null);
 
-  const [checkStep, setCheckStep] = useState(0);
+ const [, setCheckStep] = useState(0);
 
 
 

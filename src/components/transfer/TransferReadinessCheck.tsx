@@ -2,7 +2,7 @@ import {
   AlertCircle,
   ArrowRight,
   CheckCircle2,
-  MapPin,
+  
 } from "lucide-react";
 
 import type {

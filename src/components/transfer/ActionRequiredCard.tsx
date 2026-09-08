@@ -1,52 +1,34 @@
 import {
-  AlertCircle,
+ 
   ArrowRight,
-  Clock3,
-  ShieldCheck,
-  UsersRound,
+ 
 } from "lucide-react";
 
-import type { PartyRole, Transfer } from "../../types/transfer";
+import type {  Transfer } from "../../types/transfer";
 import { getActionRequired } from "../../utils/workflow";
-import { useLanguage } from "../../context/LanguageContext";
+
 
 interface ActionRequiredCardProps {
   transfer: Transfer;
   onAction?: () => void;
 }
 
-const roleLabels: Record<PartyRole | "system", string> = {
-  seller: "Seller action required",
-  buyer: "Buyer action required",
-  rto: "RTO action required",
-  shared: "Seller and buyer action required",
-  system: "Transfer status",
-};
 
-function getRoleIcon(role: PartyRole | "system") {
-  if (role === "shared") {
-    return UsersRound;
-  }
 
-  if (role === "system") {
-    return ShieldCheck;
-  }
 
-  return role === "rto" ? AlertCircle : Clock3;
-}
 
 export function ActionRequiredCard({
   transfer,
   onAction,
 }: ActionRequiredCardProps) {
-  const { t } = useLanguage();
+  
   const action = getActionRequired(transfer);
 
 if (!action) {
   return null;
 }
 
-const Icon = getRoleIcon(action.role);
+
 
 const needsAttention =
   transfer.status === "ACTION_REQUIRED";

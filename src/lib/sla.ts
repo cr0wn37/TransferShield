@@ -1,5 +1,5 @@
 import type {
-  PartyRole,
+  
   Transfer,
   TransferStatus,
 } from "../types/transfer";

@@ -145,9 +145,7 @@ const aiIssueCount =
               const aiPassed =
                 aiVerification?.status === "verified";
 
-              const aiNeedsAttention =
-                aiVerification?.status === "needs_correction" ||
-                aiVerification?.status === "unable_to_verify";
+              
 
               return (
                 <div

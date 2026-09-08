@@ -111,8 +111,7 @@ useEffect(() => {
   );
 }, [handoverStorageKey, handoverConfirmed]);
 
-  const [paymentComplete, setPaymentComplete] =
-    useState<boolean>(false);
+  const [, setPaymentComplete] = useState(false);
 
   const [sellerConfirmed, setSellerConfirmed] = useState(() => {
   return (

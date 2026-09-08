@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 import {
-  createLiveTransfer,
+  
   getLiveTransferBySessionCode,
 } from "../../lib/liveTransferSync";
 

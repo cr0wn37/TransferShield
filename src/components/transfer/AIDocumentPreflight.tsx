@@ -81,9 +81,7 @@ export default function AIDocumentPreflight({
 
  const checkedCount = Object.keys(results).length;
 
-const verifiedCount = Object.values(results).filter(
-  (result) => result.status === "verified",
-).length;
+
 
   
 
