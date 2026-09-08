@@ -111,14 +111,6 @@ const [, setFinancierResult] =
   setIsChecking(true);
   setCheckStep(1);
 
-  useEffect(() => {
-  if (!autoRun) {
-    return;
-  }
-
-  void runCheck();
-}, [autoRun]);
-
   try {
     await new Promise((resolve) =>
       setTimeout(resolve, 600),
@@ -165,6 +157,14 @@ const [, setFinancierResult] =
     setIsChecking(false);
   }
 };
+
+useEffect(() => {
+  if (!autoRun) {
+    return;
+  }
+
+  void runCheck();
+}, [autoRun]);
 
   const resolveIssue = (issue: ComplianceIssue) => {
   setResolvedIssues((current) => {
