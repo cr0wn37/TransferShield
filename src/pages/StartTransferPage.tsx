@@ -19,7 +19,7 @@ import type { VehicleCompliance } from "../types/vehicleCompliance";
 import type { ComplianceScenario } from "../lib/vehicleCompliance";
 
 import VehicleComplianceGate from "../components/transfer/VehicleComplianceGate";
-import { LanguageToggle } from "../components/LanguageToggle";
+
 import { useLanguage } from "../context/LanguageContext";
 
 const mockVehicleDetails = {
@@ -228,7 +228,7 @@ if (!vehicleRegPattern.test(normalizedRegistrationNumber)) {
       Get started
     </Link>
 
-    <LanguageToggle />
+    
   </nav>
 </header>
 
