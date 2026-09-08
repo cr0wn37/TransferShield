@@ -12,6 +12,8 @@ interface TaskCardProps {
   task: TransferTask;
   status: TaskStatus;
   onAction?: () => void;
+  correctionsResolved?: boolean;
+onResubmitToRto?: () => void;
 }
 
 const ownerLabels: Record<PartyRole, string> = {
@@ -56,68 +58,122 @@ const statusConfig: Record<
   },
 };
 
-export function TaskCard({ task, status, onAction }: TaskCardProps) {
+export function TaskCard({ task, status, onAction, correctionsResolved, onResubmitToRto }: TaskCardProps) {
+  console.log(
+    "TASK CARD:",
+    task.title,
+    "status:",
+    status,
+    "correctionsResolved:",
+    correctionsResolved,
+  );
   const config = statusConfig[status];
   const StatusIcon = config.icon;
   const isActionable = status === "pending" || status === "blocked";
 
-  return (
-    <article className={`rounded-xl border p-4 ${config.cardClassName}`}>
-      <div className="flex items-start gap-3">
-        <StatusIcon
-          aria-hidden="true"
-          className={`mt-0.5 h-5 w-5 shrink-0 ${
-            status === "completed"
-              ? "text-emerald-600"
-              : status === "blocked"
-                ? "text-amber-700"
-                : "text-slate-500"
-          }`}
-        />
+ return (
+  <article
+    className={[
+      "border p-4 transition",
+      status === "completed"
+        ? "border-[#d8e5d9] bg-[#f4f8f4]"
+        : status === "locked"
+          ? "border-[#e5ddd5] bg-[#f8f3ee]"
+          : status === "blocked"
+            ? "border-[#ead7ad] bg-[#fbf3e3]"
+            : "border-[#e1d3cb] bg-[#fffdf9]",
+    ].join(" ")}
+  >
+    <div className="flex items-start gap-3">
+      <StatusIcon
+        aria-hidden="true"
+        className={[
+          "mt-0.5 h-5 w-5 shrink-0",
+          status === "completed"
+            ? "text-[#6f8a72]"
+            : status === "blocked"
+              ? "text-[#a46f24]"
+              : status === "locked"
+                ? "text-[#a79b91]"
+                : "text-[#6b635d]",
+        ].join(" ")}
+      />
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-slate-900">{task.title}</p>
-
-            <span
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${config.badgeClassName}`}
-            >
-              {config.label}
-            </span>
-          </div>
-
-          <p className="mt-2 text-sm leading-5 text-slate-600">
-            {task.description}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <p
+            className={[
+              "text-sm font-semibold",
+              status === "locked"
+                ? "text-[#7b7169]"
+                : "text-[#24201d]",
+            ].join(" ")}
+          >
+            {task.title}
           </p>
 
-          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {ownerLabels[task.owner]}
-          </p>
-
-          {status === "locked" ? (
-            <p className="mt-2 text-xs text-slate-500">
-              Complete the earlier step to unlock this task.
-            </p>
-          ) : null}
-
-          {status === "blocked" && task.blockedReason ? (
-            <p className="mt-2 text-xs font-medium text-amber-800">
-              {task.blockedReason}
-            </p>
-          ) : null}
-
-          {isActionable && task.actionLabel && onAction ? (
-            <button
-              type="button"
-              onClick={onAction}
-              className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
-            >
-              {status === "blocked" ? "Fix & re-upload" : task.actionLabel}
-              <ArrowRight aria-hidden="true" className="h-4 w-4" />
-            </button>
-          ) : null}
+          <span
+            className={[
+              "border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em]",
+              status === "completed"
+                ? "border-[#c7d8ca] bg-[#eef5ef] text-[#56715a]"
+                : status === "blocked"
+                  ? "border-[#e0c487] bg-[#fbf3e3] text-[#8c6427]"
+                  : status === "locked"
+                    ? "border-[#d9d0c7] bg-[#f1ece7] text-[#8a7d72]"
+                    : "border-[#d9c2b7] bg-[#f8ece7] text-[#9a604a]",
+            ].join(" ")}
+          >
+            {config.label}
+          </span>
         </div>
+
+        <p
+          className={[
+            "mt-2 text-sm leading-5",
+            status === "locked"
+              ? "text-[#9b9188]"
+              : "text-[#6b635d]",
+          ].join(" ")}
+        >
+          {task.description}
+        </p>
+
+        <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+          {ownerLabels[task.owner]}
+        </p>
+
+        {status === "locked" ? (
+          <p className="mt-2 text-xs leading-5 text-[#9b9188]">
+            Complete the earlier step to unlock this task.
+          </p>
+        ) : null}
+
+        {status === "blocked" && task.blockedReason ? (
+          <p className="mt-2 text-xs font-medium leading-5 text-[#8c6427]">
+            {task.blockedReason}
+          </p>
+        ) : null}
+
+        {isActionable &&
+        task.actionLabel &&
+        (onAction || onResubmitToRto) ? (
+          <button
+            type="button"
+            onClick={onAction}
+            className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[#332e2a]"
+          >
+            {status === "blocked"
+              ? "Fix & re-upload"
+              : task.actionLabel}
+
+            <ArrowRight
+              aria-hidden="true"
+              className="h-4 w-4"
+            />
+          </button>
+        ) : null}
       </div>
-    </article>
-  );
-}
+    </div>
+  </article>
+);}

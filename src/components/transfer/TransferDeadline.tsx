@@ -30,80 +30,112 @@ export function TransferDeadline({ transfer }: TransferDeadlineProps) {
     type === "interstate" ? "Interstate transfer" : "Same-state transfer";
 
   return (
-    <section
-      aria-label="Statutory transfer deadline"
-      className={`rounded-2xl border p-4 shadow-sm sm:p-5 ${
-        isExpired
-          ? "border-rose-200 bg-rose-50"
-          : isUrgent
-            ? "border-amber-200 bg-amber-50"
-            : "border-amber-100 bg-amber-50/40"
-      }`}
-    >
-      <div className="flex items-start gap-4">
-        <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-            isExpired
-              ? "bg-rose-100 text-rose-700"
-              : isUrgent
-                ? "bg-amber-100 text-amber-700"
-                : "bg-amber-50 text-amber-700"
-          }`}
-        >
-          {isExpired ? (
-            <AlertCircle aria-hidden="true" className="h-5 w-5" />
-          ) : (
-            <CalendarClock aria-hidden="true" className="h-5 w-5" />
-          )}
-        </div>
+  <section
+    aria-label="Statutory transfer deadline"
+    className={[
+      "border bg-[#fffdf9]",
+      isExpired
+        ? "border-[#d9b5b5]"
+        : isUrgent
+          ? "border-[#dfc58e]"
+          : "border-[#d9d0c7]",
+    ].join(" ")}
+  >
+    {/* Header */}
+    <div className="border-b border-[#e5ddd5] px-4 py-3">
+      <div className="flex items-center gap-2">
+        {isExpired ? (
+          <AlertCircle
+            aria-hidden="true"
+            className="h-4 w-4 text-[#a94444]"
+          />
+        ) : (
+          <CalendarClock
+            aria-hidden="true"
+            className="h-4 w-4 text-[#b56f52]"
+          />
+        )}
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                Statutory transfer deadline
-              </p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7d72]">
+          Statutory deadline
+        </p>
+      </div>
+    </div>
 
-              <p className="mt-1 text-xs font-medium text-slate-500">
-                {transferType} · {days}-day application window
-              </p>
-            </div>
-
-            <span
-                className={`rounded-full px-3 py-1 text-sm font-bold ${
-                  isExpired
-                    ? "bg-rose-100 text-rose-700"
-                    : isUrgent
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-amber-50 text-amber-700"
+    {/* Main deadline */}
+    <div className="px-4 py-4">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p
+            className={[
+              "text-2xl font-bold tracking-tight",
+              isExpired
+                ? "text-[#a94444]"
+                : isUrgent
+                  ? "text-[#a46f24]"
+                  : "text-[#24201d]",
+            ].join(" ")}
+          >
+            {isExpired
+              ? "Expired"
+              : `${daysRemaining} ${
+                  daysRemaining === 1 ? "day" : "days"
                 }`}
-              >
-              {isExpired
-                ? "Deadline reached"
-                : `${daysRemaining} ${
-                    daysRemaining === 1 ? "day" : "days"
-                  } remaining`}
-            </span>
-          </div>
-
-          <p className="mt-3 text-sm leading-5 text-slate-600">
-            Complete the ownership transfer within the applicable statutory
-            window. TransferShield keeps the remaining time visible so
-            neither party loses track of the deadline.
           </p>
 
-          <p className="mt-3 text-xs text-slate-500">
-            Deadline:{" "}
-            <span className="font-semibold text-slate-700">
-              {deadlineDate.toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </span>
+          {!isExpired ? (
+            <p className="mt-0.5 text-xs text-[#8a7d72]">
+              remaining
+            </p>
+          ) : null}
+        </div>
+
+        <div className="text-right">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+            Deadline
+          </p>
+
+          <p className="mt-1 text-xs font-semibold text-[#24201d]">
+            {deadlineDate.toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
           </p>
         </div>
       </div>
-    </section>
-  );
-}
+
+      {/* Transfer type */}
+      <div className="mt-4 border-t border-[#e5ddd5] pt-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8a7d72]">
+          Application window
+        </p>
+
+        <p className="mt-1 text-xs font-semibold text-[#24201d]">
+          {transferType} · {days}-day window
+        </p>
+      </div>
+
+      {/* Status message */}
+      <p className="mt-3 text-xs leading-5 text-[#6b635d]">
+        Complete the ownership transfer within the applicable statutory
+        window.
+      </p>
+
+      {/* Urgency state */}
+      {isExpired ? (
+        <div className="mt-3 border-l-2 border-[#c96262] bg-[#fbefef] px-3 py-2">
+          <p className="text-xs font-semibold text-[#8f3d3d]">
+            Deadline reached
+          </p>
+        </div>
+      ) : isUrgent ? (
+        <div className="mt-3 border-l-2 border-[#d49a45] bg-[#fbf3e3] px-3 py-2">
+          <p className="text-xs font-semibold text-[#8c6427]">
+            Deadline approaching
+          </p>
+        </div>
+      ) : null}
+    </div>
+  </section>
+);}

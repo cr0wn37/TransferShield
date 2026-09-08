@@ -5,6 +5,8 @@ import {
   Printer,
   ShieldCheck,
 } from "lucide-react";
+import { FileDown } from "lucide-react";
+import { generateTransferCompletionCertificate } from "../../lib/generateTransferCompletionCertificate";
 
 import type { Transfer } from "../../types/transfer";
 
@@ -24,110 +26,151 @@ function formatTimestamp(timestamp?: string) {
 }
 
 export function CompletionRecord({ transfer }: CompletionRecordProps) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm">
-      <div className="bg-emerald-700 px-5 py-6 text-white sm:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
-              <CheckCircle2 aria-hidden="true" className="h-6 w-6" />
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-emerald-100">
-                Government transfer status
-              </p>
-              <h2 className="mt-1 text-2xl font-bold">
-                Transfer completed
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-emerald-50">
-                Ownership transfer has been recorded as complete.
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50 print:hidden"
-          >
-            <Printer aria-hidden="true" className="h-4 w-4" />
-            Print / save as PDF
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Application ID
-          </p>
-          <p className="mt-2 text-lg font-bold text-slate-950">{transfer.id}</p>
-        </div>
-
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Completion timestamp
-          </p>
-          <p className="mt-2 text-sm font-semibold leading-6 text-slate-950">
-            {formatTimestamp(transfer.completedAt)}
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Vehicle registration
-          </p>
-          <p className="mt-2 text-lg font-bold text-slate-950">
-            {transfer.vehicle.registrationNumber}
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            RTO decision
-          </p>
-          <p className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
-            <Landmark aria-hidden="true" className="h-4 w-4" />
-            Approved by RTO
-          </p>
-        </div>
-      </div>
-
-      <div className="border-t border-slate-200 px-5 py-5 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex items-start gap-3">
-            <FileCheck2
+ return (
+  <section
+    aria-label="Transfer completion record"
+    className="border border-[#cdddcf] bg-[#fffdf9]"
+  >
+    {/* Completion header */}
+    <div className="border-b border-[#cdddcf] bg-[#f4f8f4] px-5 py-4 sm:px-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#cdddcf] bg-[#fffdf9] text-[#5d7c60]">
+            <CheckCircle2
               aria-hidden="true"
-              className="mt-0.5 h-5 w-5 shrink-0 text-blue-700"
+              className="h-4 w-4"
             />
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Seller</p>
-              <p className="mt-1 text-sm text-slate-600">
-                {transfer.seller.name}
-              </p>
-            </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <ShieldCheck
-              aria-hidden="true"
-              className="mt-0.5 h-5 w-5 shrink-0 text-violet-700"
-            />
-            <div>
-              <p className="text-sm font-semibold text-slate-900">Buyer</p>
-              <p className="mt-1 text-sm text-slate-600">
-                {transfer.buyer.name}
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#5d7c60]">
+              Government transfer status
+            </p>
+
+            <h2 className="mt-1 text-lg font-bold tracking-tight text-[#24201d]">
+              Transfer completed
+            </h2>
+
+            <p className="mt-1 text-xs text-[#6b635d]">
+              RTO approved the ownership transfer.
+            </p>
           </div>
         </div>
 
-        <p className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-900">
-          Keep this transfer ID and the audit timeline as your record of the
-          completed ownership transfer.
+       <button
+          type="button"
+          onClick={() => {
+            generateTransferCompletionCertificate({
+              applicationId: transfer.id,
+              recordNumber: `TS-TRF-${transfer.id}`,
+              vehicleNumber: transfer.vehicle.registrationNumber,
+              chassisLast5: transfer.vehicle.chassisLast5,
+              sellerName: transfer.seller.name,
+              buyerName: transfer.buyer.name,
+              rtoName: "Maharashtra Motor Vehicle Department",
+              transferType: "Sale / ownership transfer",
+              completedAt: new Date().toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              }),
+            });
+          }}
+          className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#332e2a]"
+        >
+          <FileDown
+            aria-hidden="true"
+            className="h-3.5 w-3.5"
+          />
+          Download transfer certificate
+        </button>
+      </div>
+    </div>
+
+    {/* Core details */}
+    <div className="grid grid-cols-2">
+      <div className="border-b border-[#e5ddd5] px-4 py-3 sm:px-5">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+          Application ID
+        </p>
+
+        <p className="mt-1 font-mono text-xs font-bold tracking-wide text-[#24201d]">
+          {transfer.id}
         </p>
       </div>
-    </section>
-  );
-}
+
+      <div className="border-b border-l border-[#e5ddd5] px-4 py-3 sm:px-5">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+          Completed
+        </p>
+
+        <p className="mt-1 text-xs font-semibold text-[#24201d]">
+          {formatTimestamp(transfer.completedAt)}
+        </p>
+      </div>
+
+      <div className="px-4 py-3 sm:px-5">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+          Vehicle
+        </p>
+
+        <p className="mt-1 text-xs font-bold tracking-wide text-[#24201d]">
+          {transfer.vehicle.registrationNumber}
+        </p>
+      </div>
+
+      <div className="border-l border-[#e5ddd5] px-4 py-3 sm:px-5">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+          RTO decision
+        </p>
+
+        <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-[#5d7c60]">
+          <Landmark
+            aria-hidden="true"
+            className="h-3.5 w-3.5"
+          />
+          Approved
+        </p>
+      </div>
+    </div>
+
+    {/* Parties */}
+    <div className="border-t border-[#e5ddd5] px-4 py-3 sm:px-5">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="min-w-0">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+            Seller
+          </p>
+
+          <p className="mt-1 truncate text-xs font-semibold text-[#24201d]">
+            {transfer.seller.name}
+          </p>
+        </div>
+
+        <div className="min-w-0">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+            Buyer
+          </p>
+
+          <p className="mt-1 truncate text-xs font-semibold text-[#24201d]">
+            {transfer.buyer.name}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 border-t border-[#e5ddd5] pt-4">
+  <div className="border-l-2 border-[#7c9a7f] bg-[#f4f8f4] px-3 py-3">
+    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#5d7c60]">
+      What happens next
+    </p>
+
+    <p className="mt-1 text-xs leading-5 text-[#5d635d]">
+      Your TransferShield workflow is complete. No further online action is
+      needed unless the RTO requests additional documents or an in-person
+      visit.
+    </p>
+  </div>
+</div>
+    </div>
+  </section>
+);}

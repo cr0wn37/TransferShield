@@ -145,6 +145,9 @@ export const initialTransfer: Transfer = {
       alsoRequiredAt: "SELLER_ESIGN_PENDING",
       signers: ["seller", "buyer"],
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "buyer-address-proof",
@@ -153,6 +156,9 @@ export const initialTransfer: Transfer = {
       owner: "buyer",
       requiredAt: "BUYER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "buyer-dob-proof",
@@ -161,6 +167,9 @@ export const initialTransfer: Transfer = {
       owner: "buyer",
       requiredAt: "BUYER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "buyer-photo",
@@ -169,6 +178,9 @@ export const initialTransfer: Transfer = {
       owner: "buyer",
       requiredAt: "BUYER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "form-29",
@@ -178,6 +190,9 @@ export const initialTransfer: Transfer = {
       requiredAt: "SELLER_ESIGN_PENDING",
       signers: ["seller"],
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "seller-address-proof",
@@ -186,6 +201,9 @@ export const initialTransfer: Transfer = {
       owner: "seller",
       requiredAt: "SELLER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "seller-dob-proof",
@@ -194,6 +212,9 @@ export const initialTransfer: Transfer = {
       owner: "seller",
       requiredAt: "SELLER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
     {
       id: "seller-photo",
@@ -202,6 +223,9 @@ export const initialTransfer: Transfer = {
       owner: "seller",
       requiredAt: "SELLER_ESIGN_PENDING",
       status: "missing",
+      rtoReview: {
+  status: "pending",
+},
     },
   ],
 

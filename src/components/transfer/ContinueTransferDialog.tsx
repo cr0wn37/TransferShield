@@ -63,27 +63,29 @@ export function ContinueTransferDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-slate-950/50 p-4 sm:items-center sm:justify-center">
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="continue-transfer-title"
-        className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl sm:p-6"
-      >
+  <div className="fixed inset-0 z-50 flex items-end bg-[#24201d]/45 p-3 sm:items-center sm:justify-center sm:p-6">
+    <section
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="continue-transfer-title"
+      className="w-full max-w-md border border-[#d9d0c7] bg-[#fffdf9] shadow-2xl"
+    >
+      {/* Header */}
+      <div className="border-b border-[#e5ddd5] px-5 py-4 sm:px-6">
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-blue-700">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b56f52]">
               TransferShield
             </p>
 
             <h2
               id="continue-transfer-title"
-              className="mt-1 text-xl font-bold text-slate-950"
+              className="mt-1 text-lg font-bold tracking-tight text-[#24201d]"
             >
               Continue existing transfer
             </h2>
 
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="mt-2 text-xs leading-5 text-[#6b635d]">
               Verify your transfer and mobile number to continue safely.
             </p>
           </div>
@@ -92,25 +94,34 @@ export function ContinueTransferDialog({
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#d9d0c7] text-[#8a7d72] transition hover:bg-[#f8f3ee] hover:text-[#24201d]"
           >
-            <X className="h-5 w-5" aria-hidden="true" />
+            <X
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
           </button>
         </div>
+      </div>
 
-        <div className="mt-6 space-y-4">
-          <label className="block text-sm font-semibold text-slate-700">
+      {/* Content */}
+      <div className="px-5 py-5 sm:px-6">
+        <div className="space-y-4">
+          {/* Transfer ID */}
+          <label className="block text-xs font-semibold text-[#24201d]">
             Transfer ID
+
             <input
               value={transferId}
               onChange={(event) => setTransferId(event.target.value)}
               placeholder="e.g. TS-2026-482193"
-              className="mt-1.5 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              className="mt-1.5 min-h-11 w-full border border-[#d9d0c7] bg-white px-3 text-sm text-[#24201d] outline-none transition placeholder:text-[#aaa098] focus:border-[#24201d]"
             />
           </label>
 
+          {/* Role */}
           <div>
-            <p className="text-sm font-semibold text-slate-700">
+            <p className="text-xs font-semibold text-[#24201d]">
               Continue as
             </p>
 
@@ -120,11 +131,12 @@ export function ContinueTransferDialog({
                   key={option}
                   type="button"
                   onClick={() => handleRoleChange(option)}
-                  className={`min-h-11 rounded-xl border px-4 py-2.5 text-sm font-semibold capitalize transition ${
+                  className={[
+                    "min-h-11 border px-4 py-2.5 text-sm font-semibold capitalize transition",
                     role === option
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
+                      ? "border-[#24201d] bg-[#f8f3ee] text-[#24201d]"
+                      : "border-[#d9d0c7] bg-[#fffdf9] text-[#6b635d] hover:bg-[#f8f3ee] hover:text-[#24201d]",
+                  ].join(" ")}
                 >
                   {option}
                 </button>
@@ -132,88 +144,120 @@ export function ContinueTransferDialog({
             </div>
           </div>
 
-          <label className="block text-sm font-semibold text-slate-700">
+          {/* Registered mobile */}
+          <label className="block text-xs font-semibold text-[#24201d]">
             Registered mobile number
+
             <input
               value={registeredMobile}
               readOnly
-              className="mt-1.5 min-h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-600 outline-none"
+              className="mt-1.5 min-h-11 w-full border border-[#d9d0c7] bg-[#f8f3ee] px-3 text-sm text-[#6b635d] outline-none"
             />
           </label>
 
-          <div className="rounded-xl bg-slate-50 p-4">
+          {/* OTP destination */}
+          <div className="border border-[#d9d0c7] bg-[#f8f3ee] px-4 py-3">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
-                <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#d9d0c7] bg-[#fffdf9] text-[#b56f52]">
+                <ShieldCheck
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                />
               </div>
 
-              <div>
-                <p className="text-sm font-semibold text-slate-900">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-[#24201d]">
                   OTP destination
                 </p>
 
-                <p className="mt-1 text-sm text-slate-600">
+                <p className="mt-1 text-xs leading-5 text-[#6b635d]">
                   OTP will be sent to the mobile number registered for the{" "}
-                  {role}.
+                  <span className="font-semibold text-[#24201d]">
+                    {role}
+                  </span>
+                  .
                 </p>
 
-                <p className="mt-1 text-xs font-medium text-slate-500">
+                <p className="mt-1 text-[11px] font-medium text-[#8a7d72]">
                   Registered number: {registeredMobile}
                 </p>
               </div>
             </div>
           </div>
 
+          {/* OTP */}
           {otpSent ? (
-            <label className="block text-sm font-semibold text-slate-700">
+            <label className="block text-xs font-semibold text-[#24201d]">
               Enter OTP
+
               <input
                 value={otp}
                 onChange={(event) =>
-                  setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  setOtp(
+                    event.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 6),
+                  )
                 }
                 inputMode="numeric"
                 maxLength={6}
                 placeholder="123456"
-                className="mt-1.5 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-center text-base tracking-[0.3em] text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                className="mt-1.5 min-h-11 w-full border border-[#d9d0c7] bg-white px-3 text-center text-base tracking-[0.3em] text-[#24201d] outline-none transition placeholder:text-[#b8aea6] focus:border-[#24201d]"
               />
 
-              <p className="mt-2 text-xs font-medium text-slate-500">
+              <p className="mt-2 text-[11px] font-medium text-[#8a7d72]">
                 Demo OTP: 123456
               </p>
             </label>
           ) : null}
 
+          {/* Error */}
           {error ? (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
-              {error}
-            </p>
+            <div className="border-l-2 border-[#c96262] bg-[#fbefef] px-3 py-3">
+              <p className="text-xs font-medium leading-5 text-[#9a4f4f]">
+                {error}
+              </p>
+            </div>
           ) : null}
 
+          {/* Primary action */}
           <button
             type="button"
             onClick={otpSent ? handleVerify : handleRequestOtp}
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-700"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#332e2a]"
           >
             {otpSent ? "Verify & continue" : "Request OTP"}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+
+            <ArrowRight
+              className="h-4 w-4"
+              aria-hidden="true"
+            />
           </button>
-          <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+
+          {/* Demo credentials */}
+          <div className="border border-[#d9d0c7] bg-[#f8f3ee] px-4 py-3">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-[#b56f52]">
               Demo credentials
             </p>
 
-            <div className="mt-2 space-y-1 text-sm text-blue-900">
+            <div className="mt-2 space-y-1 text-xs text-[#6b635d]">
               <p>
-                <span className="font-semibold">Transfer ID:</span> {transfer.id}
+                <span className="font-semibold text-[#24201d]">
+                  Transfer ID:
+                </span>{" "}
+                {transfer.id}
               </p>
+
               <p>
-                <span className="font-semibold">Demo OTP:</span> 123456
+                <span className="font-semibold text-[#24201d]">
+                  Demo OTP:
+                </span>{" "}
+                123456
               </p>
             </div>
           </div>
         </div>
-      </section>
-    </div>
-  );
-}
+      </div>
+    </section>
+  </div>
+);}

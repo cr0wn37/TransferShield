@@ -8,6 +8,7 @@ import {
 
 import type { PartyRole, Transfer } from "../../types/transfer";
 import { getActionRequired } from "../../utils/workflow";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface ActionRequiredCardProps {
   transfer: Transfer;
@@ -38,123 +39,108 @@ export function ActionRequiredCard({
   transfer,
   onAction,
 }: ActionRequiredCardProps) {
+  const { t } = useLanguage();
   const action = getActionRequired(transfer);
-  const Icon = getRoleIcon(action.role);
-  const needsAttention = transfer.status === "ACTION_REQUIRED";
 
-  return (
+if (!action) {
+  return null;
+}
+
+const Icon = getRoleIcon(action.role);
+
+const needsAttention =
+  transfer.status === "ACTION_REQUIRED";
+
+ return (
   <section
     aria-label="Required next action"
-    className={`rounded-2xl border p-5 shadow-sm sm:p-6 ${
+    className={
       needsAttention
-        ? "border-amber-200 bg-amber-50"
-        : "border-blue-100 bg-blue-50"
-    }`}
+        ? "border-l-2 border-[#d49a45] bg-[#fbf3e3] p-3"
+        : ""
+    }
   >
-    <div className="flex items-start gap-4">
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-          needsAttention
-            ? "bg-amber-100 text-amber-800"
-            : "bg-blue-100 text-blue-700"
-        }`}
+    {needsAttention ? (
+      <>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8c6427]">
+          Correction
+        </p>
+
+        <div className="mt-3 divide-y divide-[#eadfc9] border border-[#e3cfaa] bg-[#fffaf1]">
+          <div className="grid grid-cols-[1fr_auto] gap-3 px-3 py-2.5">
+            <span className="text-xs text-[#8a7d72]">
+              Responsible party
+            </span>
+
+            <span className="text-right text-xs font-semibold text-[#24201d]">
+              {action.role === "buyer"
+                ? "Buyer"
+                : action.role === "seller"
+                  ? "Seller"
+                  : action.role === "rto"
+                    ? "RTO"
+                    : "Shared"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[1fr_auto] gap-3 px-3 py-2.5">
+            <span className="text-xs text-[#8a7d72]">
+              Issue
+            </span>
+
+            <span className="max-w-[150px] text-right text-xs font-semibold capitalize text-[#24201d]">
+              {transfer.rto.reasonCode?.replaceAll("_", " ") ??
+                "Correction requested"}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[1fr_auto] gap-3 px-3 py-2.5">
+            <span className="text-xs text-[#8a7d72]">
+              Affected document
+            </span>
+
+            <span className="max-w-[150px] text-right text-xs font-semibold text-[#24201d]">
+              {transfer.rto.requestedDocumentId
+                ? transfer.documents.find(
+                    (document) =>
+                      document.id === transfer.rto.requestedDocumentId,
+                  )?.label ?? "Document"
+                : "See correction details"}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-3 border-l-2 border-[#d49a45] bg-[#fffaf1] px-3 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8c6427]">
+            What to do
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-[#6b635d]">
+            {transfer.rto.requiredAction ??
+              "Review the correction request and update the affected information."}
+          </p>
+
+          <p className="mt-2 text-[11px] leading-5 text-[#8a7d72]">
+            Completed steps are preserved. You do not need to restart the
+            transfer.
+          </p>
+        </div>
+      </>
+    ) : null}
+
+    {action.actionLabel && onAction ? (
+      <button
+        type="button"
+        onClick={onAction}
+        className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#332e2a]"
       >
-        <Icon aria-hidden="true" className="h-5 w-5" />
-      </div>
+        {action.actionLabel}
 
-      <div className="min-w-0 flex-1">
-        <p
-          className={`text-sm font-semibold ${
-            needsAttention ? "text-amber-800" : "text-blue-700"
-          }`}
-        >
-          {roleLabels[action.role]}
-        </p>
-
-        <h2 className="mt-1 text-lg font-semibold text-slate-900">
-          {action.title}
-        </h2>
-
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-          {action.description}
-        </p>
-
-        {needsAttention ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-amber-200 bg-white/70 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Responsible party
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">
-                {action.role === "buyer"
-                  ? "Buyer"
-                  : action.role === "seller"
-                    ? "Seller"
-                    : action.role === "rto"
-                      ? "RTO"
-                      : "Shared"}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-amber-200 bg-white/70 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Issue
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">
-                {transfer.rto.reasonCode?.replaceAll("_", " ") ??
-                  "Correction requested"}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-amber-200 bg-white/70 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Affected document
-              </p>
-              <p className="mt-1 text-sm font-semibold text-slate-900">
-                {transfer.rto.requestedDocumentId
-                  ? transfer.documents.find(
-                      (document) =>
-                        document.id === transfer.rto.requestedDocumentId,
-                    )?.label ?? "Document"
-                  : "See correction details"}
-              </p>
-            </div>
-          </div>
-        ) : null}
-
-        {needsAttention ? (
-          <div className="mt-4 rounded-xl border border-amber-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">
-              What you need to do
-            </p>
-
-            <p className="mt-1 text-sm leading-6 text-slate-700">
-              {transfer.rto.requiredAction ??
-                "Review the correction request and update the affected information."}
-            </p>
-
-            <p className="mt-2 text-xs text-slate-500">
-              Your completed steps are preserved. You do not need to restart
-              the transfer.
-            </p>
-          </div>
-        ) : null}
-
-        {action.actionLabel && onAction ? (
-          <button
-            type="button"
-            onClick={onAction}
-            className={`mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-colors ${
-              needsAttention
-                ? "bg-amber-700 hover:bg-amber-800"
-                : "bg-blue-700 hover:bg-blue-800"
-            }`}
-          >
-            {action.actionLabel}
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          </button>
-        ) : null}
-      </div>
-    </div>
+        <ArrowRight
+          aria-hidden="true"
+          className="h-4 w-4"
+        />
+      </button>
+    ) : null}
   </section>
 );}

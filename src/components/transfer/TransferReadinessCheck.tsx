@@ -9,6 +9,7 @@ import type {
   ReadinessStatus,
   TransferReadinessResult,
 } from "../../utils/transferReadiness";
+import { useLanguage } from "../../context/LanguageContext";
 
 interface TransferReadinessCheckProps {
   result: TransferReadinessResult;
@@ -47,151 +48,147 @@ export function TransferReadinessCheck({
 
   const canContinue = result.readinessStatus !== "blocked";
 
+  const { t } = useLanguage();
+
   return (
-    <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-blue-700">
-            Transfer readiness
-          </p>
+  <section className="border-t border-[#e5ddd5] pt-6">
+    {/* Header */}
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#b56f52]">
+          {t("transferReadiness")}
+        </p>
 
-          <h2 className="mt-1 text-xl font-bold text-slate-950">
-            Your transfer route
-          </h2>
+        <h2 className="mt-1 text-lg font-bold tracking-tight text-[#24201d]">
+          {t("yourTransferRoute")}
+        </h2>
 
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            We checked the basic transfer route and mock vehicle
-            requirements before starting the application.
-          </p>
-        </div>
+        <p className="mt-1 text-sm leading-6 text-[#6b635d]">
+          {t("transferRouteDescription")}
+        </p>
+      </div>
 
-        <span
-          className={`inline-flex w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${status.className}`}
-        >
-          {status.label}
+      <span
+        className={`shrink-0 border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${status.className}`}
+      >
+        {status.label}
+      </span>
+    </div>
+
+    {/* Route summary */}
+    <div className="mt-5 border border-[#e5ddd5] bg-[#f8f3ee]">
+      <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-3 px-4 py-4 text-sm">
+        <span className="text-[#8a7d72]">
+          Seller RTO
+        </span>
+        <span className="text-right font-semibold text-[#24201d]">
+          {result.sellerRto}
+        </span>
+
+        <span className="border-t border-[#e5ddd5] pt-3 text-[#8a7d72]">
+          Buyer RTO
+        </span>
+        <span className="border-t border-[#e5ddd5] pt-3 text-right font-semibold text-[#24201d]">
+          {result.buyerRto}
+        </span>
+
+        <span className="border-t border-[#e5ddd5] pt-3 text-[#8a7d72]">
+          {t("transferRoute")}
+        </span>
+        <span className="border-t border-[#e5ddd5] pt-3 text-right font-semibold text-[#24201d]">
+          {routeLabels[result.routeType]}
         </span>
       </div>
+    </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl bg-slate-50 p-4">
-          <div className="flex items-center gap-2 text-slate-500">
-            <MapPin className="h-4 w-4" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-wide">
-              Seller RTO
-            </span>
+    {/* Additional requirements */}
+    {result.additionalRequirements.length > 0 ? (
+      <div className="mt-4 border-l-2 border-[#d49a45] bg-[#fbf3e3] px-4 py-3">
+        <div className="flex items-start gap-3">
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#a46f24]"
+            aria-hidden="true"
+          />
+
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#7b571f]">
+              {t("additionalRequirementsDetected")}
+            </p>
+
+            <ul className="mt-1.5 space-y-1 text-xs leading-5 text-[#8a652c]">
+              {result.additionalRequirements.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
+            </ul>
           </div>
-
-          <p className="mt-2 font-semibold text-slate-900">
-            {result.sellerRto}
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-slate-50 p-4">
-          <div className="flex items-center gap-2 text-slate-500">
-            <MapPin className="h-4 w-4" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-wide">
-              Buyer RTO
-            </span>
-          </div>
-
-          <p className="mt-2 font-semibold text-slate-900">
-            {result.buyerRto}
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Transfer route
-          </p>
-
-          <p className="mt-2 font-semibold text-slate-900">
-            {routeLabels[result.routeType]}
-          </p>
         </div>
       </div>
+    ) : null}
 
-      {result.additionalRequirements.length > 0 ? (
-        <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle
-              className="mt-0.5 h-5 w-5 shrink-0 text-amber-700"
-              aria-hidden="true"
-            />
+    {/* Warnings */}
+    {result.warnings.length > 0 ? (
+      <div className="mt-4 border border-[#e5ddd5] bg-white px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8a7d72]">
+          {t("checksToComplete")}
+        </p>
 
-            <div>
-              <p className="text-sm font-semibold text-amber-900">
-                Additional requirements detected
-              </p>
-
-              <ul className="mt-2 space-y-1 text-sm text-amber-800">
-                {result.additionalRequirements.map((item) => (
-                  <li key={item}>• {item}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {result.warnings.length > 0 ? (
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-sm font-semibold text-slate-900">
-            Checks to complete
-          </p>
-
-          <ul className="mt-2 space-y-1 text-sm text-slate-600">
-            {result.warnings.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      {result.blockers.length > 0 ? (
-        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4">
-          <p className="text-sm font-semibold text-rose-900">
-            Transfer cannot start yet
-          </p>
-
-          <ul className="mt-2 space-y-1 text-sm text-rose-800">
-            {result.blockers.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          {canContinue ? (
-            <CheckCircle2
-              className="h-5 w-5 text-emerald-600"
-              aria-hidden="true"
-            />
-          ) : (
-            <AlertCircle
-              className="h-5 w-5 text-rose-600"
-              aria-hidden="true"
-            />
-          )}
-
-          <span>
-            {canContinue
-              ? "You can continue to the TransferShield workspace."
-              : "Resolve the blocker before starting the transfer."}
-          </span>
-        </div>
-
-        <button
-          type="button"
-          disabled={!canContinue}
-          onClick={onContinue}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Start transfer
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </button>
+        <ul className="mt-2 space-y-1 text-xs leading-5 text-[#6b635d]">
+          {result.warnings.map((item) => (
+            <li key={item}>• {item}</li>
+          ))}
+        </ul>
       </div>
-    </section>
-  );
-}
+    ) : null}
+
+    {/* Blockers */}
+    {result.blockers.length > 0 ? (
+      <div className="mt-4 border-l-2 border-[#c96262] bg-[#fbefef] px-4 py-3">
+        <p className="text-sm font-semibold text-[#8f3d3d]">
+          {t("transferCannotStartYet")}
+        </p>
+
+        <ul className="mt-2 space-y-1 text-xs leading-5 text-[#a94444]">
+          {result.blockers.map((item) => (
+            <li key={item}>• {item}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null}
+
+    {/* Bottom action */}
+    <div className="mt-5 border-t border-[#e5ddd5] pt-5">
+      <div className="flex items-start gap-3">
+        {canContinue ? (
+          <CheckCircle2
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#6f8a72]"
+            aria-hidden="true"
+          />
+        ) : (
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#b45c5c]"
+            aria-hidden="true"
+          />
+        )}
+
+        <p className="flex-1 text-xs leading-5 text-[#6b635d]">
+          {canContinue
+            ? t("continueToTransferShieldWorkspace")
+            : t("resolveBlockerBeforeStarting")}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        disabled={!canContinue}
+        onClick={onContinue}
+        className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#332e2a] disabled:cursor-not-allowed disabled:border-[#d9d0c7] disabled:bg-[#e8e1da] disabled:text-[#9b9188]"
+      >
+        {t("startTransfer")}
+        <ArrowRight
+          className="h-4 w-4"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  </section>
+);}

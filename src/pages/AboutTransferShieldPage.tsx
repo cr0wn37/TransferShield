@@ -1,230 +1,461 @@
 import {
   ArrowRight,
   CheckCircle2,
+  ClipboardCheck,
+  Clock3,
   FileCheck2,
-  GitBranch,
-  ClipboardList,
+  FileWarning,
+  Landmark,
+  LockKeyhole,
   RefreshCcw,
+  ScanSearch,
   ShieldCheck,
-  Smartphone,
+  TimerReset,
   UsersRound,
-  XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const improvements = [
+const steps = [
   {
+    number: "01",
+    title: "Verify vehicle",
+    description:
+      "Confirm the registration number, RTO, chassis details and registered-mobile access before the transfer begins.",
+    icon: ScanSearch,
+  },
+  {
+    number: "02",
+    title: "Check vehicle compliance",
+    description:
+      "Check for issues such as pending e-Challans and active hypothecation before the parties invest time in the transfer.",
+    icon: ShieldCheck,
+  },
+  {
+    number: "03",
+    title: "Transfer readiness",
+    description:
+      "Validate the basic conditions for the transfer and surface anything that needs attention before the shared workflow starts.",
+    icon: ClipboardCheck,
+  },
+  {
+    number: "04",
+    title: "Shared workspace",
+    description:
+      "Seller and buyer work from one shared case instead of coordinating the transfer across messages, documents and disconnected steps.",
     icon: UsersRound,
-    title: "One shared transaction",
-    description:
-      "Seller and buyer work on the same transfer instead of coordinating through messages and separate steps.",
   },
   {
-    icon: CheckCircle2,
-    title: "Clear responsibility",
+    number: "05",
+    title: "Clear action ownership",
     description:
-      "Every task shows who needs to act, what is required, and what happens next.",
+      "The workspace continuously tells the right person what to do next, why it matters and what is blocking progress.",
+    icon: TimerReset,
   },
   {
+    number: "06",
+    title: "Documents + AI verification",
+    description:
+      "Required documents are collected and checked before submission so common issues can be caught earlier.",
     icon: FileCheck2,
-    title: "Catch errors earlier",
-    description:
-      "Documents are checked before submission, and both parties get a final review before the application is sent to the RTO.",
   },
   {
+    number: "07",
+    title: "e-Sign + final review",
+    description:
+      "Each party completes their own document and e-sign package, followed by a final review before the application moves to the RTO.",
+    icon: LockKeyhole,
+  },
+  {
+    number: "08",
+    title: "RTO correction loop",
+    description:
+      "When the RTO finds a problem, the specific document is returned to the responsible party instead of forcing the entire application to restart.",
     icon: RefreshCcw,
-    title: "Recover without restarting",
-    description:
-      "When the RTO requests a correction, the exact document and responsible party are identified so the case can continue.",
   },
   {
-    icon: GitBranch,
-    title: "Track the real state",
+    number: "09",
+    title: "RTO officer review",
     description:
-      "The transfer moves through explicit states instead of leaving citizens with an unclear 'pending' status.",
+      "The officer gets a dedicated case-processing view to review documents, request corrections and approve the application.",
+    icon: Landmark,
   },
   {
-  icon: ClipboardList,
-  title: "Auditable transfer history",
-  description:
-    "Every important action is recorded with who performed it, what changed, and when it happened—from verification through final ownership transfer.",
-},
-];
-
-const simulations = [
-  "Registered-vehicle OTP verification",
-  "Aadhaar OTP e-sign",
-  "Transfer fee payment",
-  "Document validation",
-  "VAHAN / Parivahan processing",
-  "RTO review and approval",
-  "RTO rejection and correction",
-];
-
-const futureIntegrations = [
-  {
-    current: "VAHAN / Parivahan",
-    future: "Parivahan / VAHAN APIs",
+    number: "10",
+    title: "Completion + records",
     description:
-      "Vehicle RC verification, transfer-status sync and application submission.",
-  },
-  {
-    current: "DigiLocker",
-    future: "DigiLocker + eSign",
-    description:
-      "Retrieve verified documents and enable consent-based digital signing.",
-  },
-  {
-    current: "Payment gateways",
-    future: "Government payment rails",
-    description:
-      "Secure transfer-fee payment with real-time transaction confirmation.",
-  },
-  {
-    current: "RTO processing",
-    future: "RTO workflow integration",
-    description:
-      "Send applications, receive review outcomes and route corrections to the right party.",
-  },
-  {
-    current: "Notification services",
-    future: "SMS / WhatsApp / Email",
-    description:
-      "Notify buyers and sellers when an action, deadline or status changes.",
+      "Once approved, the transfer closes with a completion record, audit history and the supporting handover workflow.",
+    icon: CheckCircle2,
   },
 ];
 
-export function AboutTransferShieldPage() {
+const supportingFeatures = [
+  {
+    title: "Digital Handover",
+    description:
+      "After payment, buyer and seller can create a time-bound digital record of the physical vehicle handover.",
+    icon: HandshakeIcon,
+    accent: "green",
+  },
+  {
+    title: "SLA Clock",
+    description:
+      "Shows the statutory transfer deadline and makes it clear who currently owns the next action.",
+    icon: Clock3,
+    accent: "peach",
+  },
+  {
+    title: "Tamper-evident timeline",
+    description:
+      "A hash-chained audit trail makes changes to the transfer history detectable.",
+    icon: ShieldCheck,
+    accent: "green",
+  },
+  {
+    title: "Physical RTO docket",
+    description:
+      "Prepares the supporting physical submission packet when an in-person RTO step is required.",
+    icon: FileWarning,
+    accent: "amber",
+  },
+  {
+    title: "Live Sync",
+    description:
+      "Buyer, seller and the shared case stay synchronized as work is completed.",
+    icon: UsersRound,
+    accent: "peach",
+  },
+];
+
+function HandshakeIcon({
+  className,
+}: {
+  className?: string;
+}) {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="rounded-3xl bg-slate-950 px-6 py-8 text-white sm:px-10 sm:py-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold text-blue-300">
-                TransferShield
-              </p>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m8 12 2.5 2.5a2.1 2.1 0 0 0 3 0L16 12" />
+      <path d="m3.5 8.5 3-3a2 2 0 0 1 2.8 0L12 8.2l2.7-2.7a2 2 0 0 1 2.8 0l3 3" />
+      <path d="m3 9 3.5 6.5a2 2 0 0 0 2.7.8l1.6-.9" />
+      <path d="m21 9-3.5 6.5a2 2 0 0 1-2.7.8l-1.6-.9" />
+      <path d="M8.5 8.5 6.8 10.2a2 2 0 0 0 2.8 2.8l1-1" />
+      <path d="M15.5 8.5 17.2 10.2a2 2 0 0 1-2.8 2.8l-1-1" />
+    </svg>
+  );
+}
 
-              <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-5xl">
-                Make sure the vehicle transfer actually gets completed.
-              </h1>
+export function HowItWorksPage() {
+  return (
+    <main className="min-h-screen bg-[#f8f1e8] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        {/* ===================================================== */}
+        {/* TOP NAV                                                */}
+        {/* ===================================================== */}
 
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                TransferShield turns a fragmented ownership-transfer process
-                into one guided transaction shared by the seller, buyer and
-                RTO.
-              </p>
-            </div>
+        <div className="flex flex-col gap-3 border-b border-[#d9d0c7] pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <Link
+            to="/"
+            className="inline-flex min-h-9 items-center gap-2 text-xs font-semibold text-[#b56f52] transition hover:text-[#24201d]"
+          >
+            <ArrowRight
+              aria-hidden="true"
+              className="h-3.5 w-3.5 rotate-180"
+            />
+            Back to home
+          </Link>
+
+          <div className="flex items-center gap-4 text-xs font-semibold text-[#6b635d]">
+            <Link
+              to="/demo"
+              className="transition hover:text-[#24201d]"
+            >
+              Demo scenarios
+            </Link>
 
             <Link
-              to="/start"
-              className="inline-flex min-h-11 w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100"
+              to="/"
+              className="transition hover:text-[#24201d]"
             >
-              Start a transfer
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Start transfer
             </Link>
           </div>
-        </header>
+        </div>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-sm font-semibold text-blue-700">
-              The problem
-            </p>
+        {/* ===================================================== */}
+        {/* HERO                                                   */}
+        {/* ===================================================== */}
 
-            <h2 className="mt-2 text-2xl font-bold">
-              The sale can be complete while the government transfer is not.
-            </h2>
+        <section className="border-b border-[#d9d0c7] bg-[#fffdf9]">
+          <div className="grid gap-10 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[1.35fr_0.65fr] lg:px-10 lg:py-14">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#b56f52]">
+                How TransferShield works
+              </p>
 
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              Vehicle ownership transfer is a multi-party process involving
-              verification, buyer details, documents, payment, e-signing and
-              RTO processing. A citizen can complete several steps correctly
-              and still not know who is responsible when the process gets
-              stuck.
-            </p>
+              <h1 className="mt-3 max-w-4xl text-4xl font-bold tracking-tight text-[#24201d] sm:text-5xl">
+                One transfer. One shared case. Everyone knows what happens
+                next.
+              </h1>
 
-            <div className="mt-6 space-y-3">
-              {[
-                "Seller and buyer have to coordinate multiple actions.",
-                "Document requirements can be difficult to understand.",
-                "A rejected application may not clearly identify who should fix it.",
-                "A submitted application does not necessarily mean the transfer is complete.",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <XCircle
-                    className="mt-0.5 h-5 w-5 shrink-0 text-rose-500"
-                    aria-hidden="true"
-                  />
-                  <p className="text-sm leading-6 text-slate-700">{item}</p>
-                </div>
-              ))}
+              <p className="mt-5 max-w-3xl text-base leading-7 text-[#6b635d] sm:text-lg">
+                TransferShield turns a fragmented vehicle ownership transfer
+                into a coordinated workflow connecting the vehicle check,
+                buyer, seller, documents, payment, RTO review and final
+                handover.
+              </p>
             </div>
-          </div>
 
-          <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6 sm:p-8">
-            <p className="text-sm font-semibold text-blue-700">
-              The TransferShield approach
-            </p>
+            <div className="border-l border-[#e5ddd5] pl-6 lg:self-end">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#8a7d72]">
+                The core idea
+              </p>
 
-            <h2 className="mt-2 text-2xl font-bold">
-              One transaction. One shared state. Clear next action.
-            </h2>
+              <p className="mt-2 text-xl font-bold tracking-tight text-[#24201d]">
+                Don't just digitize the forms.
+              </p>
 
-            <div className="mt-6 space-y-4">
-              {[
-                ["Seller", "Initiates and provides seller-side information"],
-                ["Buyer", "Joins, confirms details, pays and completes buyer-side tasks"],
-                ["Both", "Review their own submission before RTO processing"],
-                ["RTO", "Reviews, approves or sends a specific correction"],
-                ["TransferShield", "Keeps the transaction moving and records what happened"],
-              ].map(([role, description]) => (
-                <div
-                  key={role}
-                  className="rounded-xl border border-blue-100 bg-white p-4"
-                >
-                  <p className="text-sm font-semibold text-slate-900">
-                    {role}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {description}
-                  </p>
-                </div>
-              ))}
+              <p className="mt-2 text-sm leading-6 text-[#6b635d]">
+                Coordinate the entire transaction from start to finish —
+                including the failures, corrections and handoffs that usually
+                cause delays.
+              </p>
             </div>
           </div>
         </section>
 
-        <section className="mt-8">
+        {/* ===================================================== */}
+        {/* TIMELINE INTRO                                          */}
+        {/* ===================================================== */}
+
+        <section className="px-1 py-10 sm:py-12">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-blue-700">
-              What changes for the citizen
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#b56f52]">
+              The transfer journey
             </p>
 
-            <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-              Complexity stays underneath. The next action stays simple.
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#24201d] sm:text-3xl">
+              From verification to completed handover
             </h2>
+
+            <p className="mt-3 text-sm leading-6 text-[#6b635d]">
+              The workflow is designed around the actual movement of a case:
+              identify the vehicle, establish readiness, coordinate both
+              parties, survive corrections, complete RTO review and close the
+              transaction cleanly.
+            </p>
+          </div>
+        </section>
+
+        {/* ===================================================== */}
+        {/* ALTERNATING TIMELINE                                   */}
+        {/* ===================================================== */}
+
+        <section className="relative pb-14">
+          {/* center line */}
+          <div
+  className="absolute bottom-12 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-[#d1c7bd] lg:block"
+  aria-hidden="true"
+/>
+
+          <div className="space-y-12 lg:space-y-16">
+  {steps.map((step, index) => {
+    const isRight = index % 2 === 0;
+    const Icon = step.icon;
+
+    return (
+      <article
+        key={step.number}
+        className="relative grid items-center gap-6 lg:grid-cols-[1fr_80px_1fr]"
+      >
+        {/* LEFT SIDE */}
+        <div className="lg:pr-16">
+          {!isRight ? (
+            <div className="border border-[#d9d0c7] bg-[#fffdf9] p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-10 w-10 items-center justify-center border border-[#d9d0c7] bg-[#f8f3ee] text-[#b56f52]">
+                  <Icon
+                    aria-hidden="true"
+                    className="h-4.5 w-4.5"
+                  />
+                </div>
+
+                <span className="text-[10px] font-semibold tracking-[0.13em] text-[#b1a69c]">
+                  {step.number}
+                </span>
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold tracking-tight text-[#24201d]">
+                {step.title}
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-[#6b635d]">
+                {step.description}
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        {/* CENTER */}
+        <div className="flex justify-start lg:justify-center">
+          <div className="relative z-10 flex h-11 w-11 items-center justify-center border border-[#cbbeb2] bg-[#f8f1e8] text-[10px] font-bold tracking-[0.08em] text-[#24201d]">
+            {step.number}
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="lg:pl-16">
+          {isRight ? (
+            <div className="border border-[#d9d0c7] bg-[#fffdf9] p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-10 w-10 items-center justify-center border border-[#d9d0c7] bg-[#f8f3ee] text-[#b56f52]">
+                  <Icon
+                    aria-hidden="true"
+                    className="h-4.5 w-4.5"
+                  />
+                </div>
+
+                <span className="text-[10px] font-semibold tracking-[0.13em] text-[#b1a69c]">
+                  {step.number}
+                </span>
+              </div>
+
+              <h3 className="mt-5 text-xl font-bold tracking-tight text-[#24201d]">
+                {step.title}
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-[#6b635d]">
+                {step.description}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </article>
+    );
+  })}
+</div>
+        </section>
+
+        {/* ===================================================== */}
+        {/* THE CORRECTION LOOP                                     */}
+        {/* ===================================================== */}
+
+        <section className="border-y border-[#d9d0c7] bg-[#fffdf9]">
+          <div className="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="border-b border-[#d9d0c7] px-5 py-7 sm:px-8 lg:border-b-0 lg:border-r lg:py-9">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b56f52]">
+                What happens when something goes wrong?
+              </p>
+
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#24201d]">
+                Corrections become a loop, not a restart.
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-[#6b635d]">
+                RTO can return a specific document to the responsible party.
+                TransferShield preserves the completed case and reopens only
+                the work that actually needs correction.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-4">
+              <div className="border-b border-[#e5ddd5] px-5 py-6 sm:border-b-0 sm:border-r">
+                <span className="text-[10px] font-bold tracking-[0.12em] text-[#8a7d72]">
+                  01
+                </span>
+                <p className="mt-2 text-sm font-bold text-[#24201d]">
+                  RTO finds an issue
+                </p>
+              </div>
+
+              <div className="border-b border-[#e5ddd5] px-5 py-6 sm:border-b-0 sm:border-r">
+                <span className="text-[10px] font-bold tracking-[0.12em] text-[#8a7d72]">
+                  02
+                </span>
+                <p className="mt-2 text-sm font-bold text-[#24201d]">
+                  Correct party notified
+                </p>
+              </div>
+
+              <div className="border-b border-[#e5ddd5] px-5 py-6 sm:border-b-0 sm:border-r">
+                <span className="text-[10px] font-bold tracking-[0.12em] text-[#8a7d72]">
+                  03
+                </span>
+                <p className="mt-2 text-sm font-bold text-[#24201d]">
+                  Only that document reopens
+                </p>
+              </div>
+
+              <div className="px-5 py-6">
+                <span className="text-[10px] font-bold tracking-[0.12em] text-[#8a7d72]">
+                  04
+                </span>
+                <p className="mt-2 text-sm font-bold text-[#5d7c60]">
+                  Correct and resubmit
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================== */}
+        {/* SUPPORTING FEATURES                                    */}
+        {/* ===================================================== */}
+
+        <section className="py-14 sm:py-16">
+          <div className="max-w-2xl">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#b56f52]">
+              Features that extend the workflow
+            </p>
+
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#24201d] sm:text-3xl">
+              Built for the parts of the transfer that happen around the form.
+            </h2>
+
+            <p className="mt-3 text-sm leading-6 text-[#6b635d]">
+              These features make the case easier to manage before, during and
+              after government review.
+            </p>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {improvements.map((item) => {
-              const Icon = item.icon;
+          <div className="mt-8 grid gap-px border border-[#d9d0c7] bg-[#d9d0c7] sm:grid-cols-2 lg:grid-cols-5">
+            {supportingFeatures.map((feature) => {
+              const FeatureIcon = feature.icon;
+
+              const iconClass =
+                feature.accent === "green"
+                  ? "border-[#cdddcf] bg-[#f4f8f4] text-[#5d7c60]"
+                  : feature.accent === "amber"
+                    ? "border-[#e3cfaa] bg-[#fbf3e3] text-[#8c6427]"
+                    : "border-[#e5c5b6] bg-[#fcf3ed] text-[#b56f52]";
 
               return (
                 <article
-                  key={item.title}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                  key={feature.title}
+                  className="bg-[#fffdf9] p-5 sm:p-6"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  <div
+                    className={`flex h-9 w-9 items-center justify-center border ${iconClass}`}
+                  >
+                    <FeatureIcon
+                      aria-hidden="true"
+                      className="h-4 w-4"
+                    />
                   </div>
 
-                  <h3 className="mt-5 font-semibold text-slate-900">
-                    {item.title}
+                  <h3 className="mt-5 text-base font-bold tracking-tight text-[#24201d]">
+                    {feature.title}
                   </h3>
 
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {item.description}
+                  <p className="mt-2 text-xs leading-5 text-[#6b635d]">
+                    {feature.description}
                   </p>
                 </article>
               );
@@ -232,217 +463,114 @@ export function AboutTransferShieldPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold text-blue-700">
-                The part judges are seeing
+        {/* ===================================================== */}
+        {/* WHY BETTER                                             */}
+        {/* ===================================================== */}
+
+        <section className="border-y border-[#d9d0c7] bg-[#fffdf9]">
+          <div className="grid gap-0 lg:grid-cols-[0.75fr_1.25fr]">
+            <div className="border-b border-[#d9d0c7] px-5 py-8 sm:px-8 lg:border-b-0 lg:border-r lg:py-10">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b56f52]">
+                Why TransferShield
               </p>
 
-              <h2 className="mt-2 text-2xl font-bold">
-                This prototype uses simulated government dependencies.
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#24201d]">
+                The problem is coordination.
               </h2>
 
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                The citizen journey is functional, but external government
-                systems and sensitive services are intentionally mocked for
-                safety and hackathon purposes.
+              <p className="mt-3 text-sm leading-6 text-[#6b635d]">
+                A vehicle transfer can involve two people, multiple documents,
+                payments, deadlines, signatures, government review and
+                corrections. The risk is not just filling out a form — it is
+                losing track of what happens next.
               </p>
             </div>
 
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 lg:max-w-sm">
-              <p className="text-sm font-semibold text-amber-900">
-                Prototype disclosure
-              </p>
+            <div className="grid sm:grid-cols-2">
+              <div className="border-b border-[#e5ddd5] px-5 py-6 sm:border-b-0 sm:border-r sm:px-7">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-[#8a7d72]">
+                  Instead of
+                </p>
 
-              <p className="mt-2 text-sm leading-6 text-amber-800">
-                No real Aadhaar, OTP, payment or government transaction is
-                performed by this prototype.
-              </p>
-            </div>
-          </div>
+                <p className="mt-2 text-lg font-bold text-[#24201d]">
+                  Scattered steps
+                </p>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {simulations.map((item) => (
-              <div
-                key={item}
-                className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3"
-              >
-                <CheckCircle2
-                  className="h-4 w-4 shrink-0 text-emerald-600"
-                  aria-hidden="true"
-                />
-                <p className="text-sm font-medium text-slate-700">{item}</p>
+                <p className="mt-2 text-sm leading-6 text-[#6b635d]">
+                  Messages, forms, payments and status updates living in
+                  different places.
+                </p>
               </div>
-            ))}
+
+              <div className="px-5 py-6 sm:px-7">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-[#5d7c60]">
+                  TransferShield
+                </p>
+
+                <p className="mt-2 text-lg font-bold text-[#24201d]">
+                  One case, one next action
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-[#6b635d]">
+                  Every participant works against the same transfer record,
+                  with clear ownership and recovery when something goes wrong.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-              <Smartphone className="h-5 w-5" aria-hidden="true" />
-            </div>
+        {/* ===================================================== */}
+        {/* FINAL CTA                                              */}
+        {/* ===================================================== */}
 
-            <p className="mt-5 text-sm font-semibold text-blue-700">
-              Why users would prefer it
+        <section className="py-14 sm:py-16">
+          <div className="border border-[#d9d0c7] bg-[#fffdf9] px-5 py-8 text-center sm:px-8 sm:py-10">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#b56f52]">
+              See it in action
             </p>
 
-            <h2 className="mt-2 text-2xl font-bold">
-              Less guessing. Less coordination. Less waiting.
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#24201d] sm:text-3xl">
+              One transfer. One shared record.
             </h2>
 
-            <div className="mt-5 space-y-4">
-              {[
-                "Users always see the current state of the transfer.",
-                "Each task tells them exactly what they need to do.",
-                "The other party's progress is visible without exposing unnecessary information.",
-                "Errors are caught before submission where possible.",
-                "When something fails, the next action is explicit.",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2
-                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600"
-                    aria-hidden="true"
-                  />
-                  <p className="text-sm leading-6 text-slate-700">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-100 text-violet-700">
-              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-            </div>
-
-            <p className="mt-5 text-sm font-semibold text-blue-700">
-              Trust and transparency
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#6b635d]">
+              Start a transfer or open a demo scenario to see how the workflow
+              behaves from verification through completion and digital
+              handover.
             </p>
 
-            <h2 className="mt-2 text-2xl font-bold">
-              The system should always tell you what is happening.
-            </h2>
+            <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
+              <Link
+                to="/"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#24201d] bg-[#24201d] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#332e2a]"
+              >
+                Start Transfer
+                <ArrowRight
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                />
+              </Link>
 
-            <div className="mt-5 space-y-4">
-              {[
-                "Verification is explicit before the transfer starts.",
-                "Sensitive actions are assigned to the responsible party.",
-                "Important events are recorded with timestamps and actors.",
-                "RTO corrections point to the exact issue instead of reopening the entire process.",
-                "The final transfer state is clearly separated from application submission.",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2
-                    className="mt-0.5 h-5 w-5 shrink-0 text-violet-600"
-                    aria-hidden="true"
-                  />
-                  <p className="text-sm leading-6 text-slate-700">{item}</p>
-                </div>
-              ))}
+              <Link
+                to="/demo"
+                className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#d9d0c7] bg-transparent px-5 py-2.5 text-sm font-semibold text-[#24201d] transition hover:border-[#24201d]"
+              >
+                Explore Demo Scenarios
+                <ArrowRight
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                />
+              </Link>
             </div>
           </div>
         </section>
 
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-              <GitBranch className="h-5 w-5" aria-hidden="true" />
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-blue-700">
-                How TransferShield could scale
-              </p>
-
-              <h2 className="mt-1 text-2xl font-bold">
-                Start with vehicle transfer. Scale into a broader transaction layer.
-              </h2>
-
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-                The long-term product would orchestrate the citizen journey
-                while relying on authoritative government and service
-                providers for verification, records and processing.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {futureIntegrations.map((item) => (
-            <div
-              key={item.current}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-4"
-            >
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {item.current}
-              </p>
-
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                {item.future}
-              </p>
-
-              <p className="mt-2 text-xs leading-5 text-slate-600">
-                {item.description}
-              </p>
-            </div>
-          ))}
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Distribution
-              </p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                Marketplace & Dealer SDK
-              </p>
-              <p className="mt-2 text-xs leading-5 text-slate-600">
-                Create a TransferShield workspace automatically when a vehicle sale is initiated on a marketplace or dealer platform.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Platform expansion
-              </p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">
-                Multi-party GovTech engine
-              </p>
-              <p className="mt-2 text-xs leading-5 text-slate-600">
-                Extend the same coordination, responsibility and audit infrastructure to workflows such as property mutation and tenant verification.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-8 rounded-2xl bg-slate-950 p-6 text-white shadow-sm sm:p-8">
-          <p className="text-sm font-semibold text-blue-300">
-            Why TransferShield exists
-          </p>
-
-          <h2 className="mt-2 max-w-3xl text-2xl font-bold sm:text-3xl">
-            The goal is not to replace Parivahan. It is to make the citizen's
-            transaction understandable, accountable and finishable.
-          </h2>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              to="/start"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-100"
-            >
-              Try the product
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-
-            <Link
-              to="/demo"
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/20 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              Explore demo scenarios
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </section>
+        <footer className="border-t border-[#d9d0c7] py-5 text-center text-[10px] leading-5 text-[#8a7d72]">
+          TransferShield is a prototype demonstrating a coordinated vehicle
+          ownership-transfer workflow. Government services, payment and
+          compliance data are simulated in the prototype.
+        </footer>
       </div>
     </main>
   );

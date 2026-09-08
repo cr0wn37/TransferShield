@@ -1,3 +1,5 @@
+import type { VehicleCompliance } from "./vehicleCompliance";
+
 export type TransferStatus =
   | "INITIATED"
   | "BUYER_INVITED"
@@ -96,18 +98,89 @@ export interface TransferDocument {
   uploadedAt?: string;
   validatedAt?: string;
   issueMessage?: string;
+  verification?: {
+  status:
+    | "verified"
+    | "needs_correction"
+    | "unable_to_verify";
+
+  confidence: number;
+
+  summary: string;
+
+  
+
+  extracted: {
+    documentType:
+      | "form_29"
+      | "form_30"
+      | "rc"
+      | "insurance"
+      | "address_proof"
+      | "dob_proof"
+      | "identity_proof"
+      | "financier_document"
+      | "passport_photo"
+      | "unknown";
+
+    ownerName: string | null;
+    buyerName: string | null;
+    vehicleNumber: string | null;
+    chassisLast5: string | null;
+    documentDate: string | null;
+    financierName: string | null;
+  };
+
+  issues: Array<{
+    field: string;
+    label: string;
+    expected: string | null;
+    found: string | null;
+    message: string;
+  }>;
+
+  
+};
+rtoReview?: {
+  status: "pending" | "approved" | "rejected";
+  reasonCode?: RejectionReasonCode;
+  reviewedAt?: string;
+  message?: string;
+};
+}
+
+export interface RtoCorrection {
+  documentId: string;
+  reasonCode: RejectionReasonCode;
+  message: string;
+  responsibleParty: Extract<
+    PartyRole,
+    "seller" | "buyer"
+  >;
+  status: "open" | "resolved";
+  requestedAt: string;
 }
 
 export interface RtoReview {
   status: RtoStatus;
+
   assignedOfficerName?: string;
+
   submittedAt?: string;
+
   reviewedAt?: string;
+
   reasonCode?: RejectionReasonCode;
+
   message?: string;
+
   responsibleParty?: PartyRole;
+
   requiredAction?: string;
+
   requestedDocumentId?: string;
+
+  corrections?: RtoCorrection[];
 }
 
 export interface Payment {
@@ -132,6 +205,19 @@ export interface TimelineEvent {
   description: string;
   actor: PartyRole | "system";
   status?: "success" | "info" | "warning" | "error";
+
+  previousHash?: string;
+  hash?: string;
+}
+
+export interface DigitalHandoverState {
+  status: 'locked' | 'ready' | 'active';
+  odometerKm?: number;
+  handoverLocation?: string;
+  completedAt?: string;
+  expiresAt?: string;
+  complianceFeePaid: boolean;
+  statutoryRefId?: string;
 }
 
 export interface Transfer {
@@ -144,6 +230,7 @@ export interface Transfer {
   vehicle: Vehicle;
   seller: Party;
   buyer: Party;
+  compliance?: VehicleCompliance;
 
   invite: TransferInvite;
   tasks: TransferTask[];
@@ -152,6 +239,7 @@ export interface Transfer {
   eSign: ESign;
   rto: RtoReview;
   timeline: TimelineEvent[];
+  handover?: DigitalHandoverState;
 
   transferDeadline: {
     type: "same_state" | "interstate";

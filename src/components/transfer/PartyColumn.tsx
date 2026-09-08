@@ -9,6 +9,7 @@ interface PartyColumnProps {
   role: Extract<PartyRole, "seller" | "buyer">;
   activeDemoRole?: "seller" | "buyer" | "rto";
   onTaskAction?: (task: TransferTask) => void;
+  
 }
 
 
@@ -32,6 +33,7 @@ export function PartyColumn({
   role,
   activeDemoRole,
   onTaskAction,
+  
 }: PartyColumnProps) {
   const person = transfer[role];
   const copy = roleCopy[role];
@@ -57,53 +59,83 @@ const isWaitingForOtherParty =
   transfer.status !== "TRANSFER_COMPLETED";
 
   return (
-    <section
-      className={`overflow-hidden rounded-2xl border bg-white shadow-sm transition ${
-        isActive
-          ? "border-slate-200 opacity-100"
-          : "border-slate-200 opacity-70"
-      }`}
-    >
-      <div className={`h-1.5 ${copy.accentClassName}`} />
-
-      <header className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl ${copy.iconClassName}`}
-        >
-          <UserRound aria-hidden="true" className="h-5 w-5" />
-        </div>
-
+  <section
+    className={[
+      "overflow-hidden border bg-[#fffdf9] transition",
+      isActive
+        ? "border-[#d9d0c7]"
+        : "border-[#e5ddd5] opacity-70",
+    ].join(" ")}
+  >
+    {/* Column heading */}
+    <header className="border-b border-[#e5ddd5] px-4 py-4">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-900">
-            {copy.label}: {person.name}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8a7d72]">
+            {copy.label}
           </p>
-          <p className="mt-0.5 text-sm text-slate-500">{copy.heading}</p>
+
+          <h3 className="mt-1 text-base font-bold tracking-tight text-[#24201d]">
+            {person.name}
+          </h3>
         </div>
-      </header>
-      {!isActive && activeDemoRole !== "rto" ? (
-        <p className="bg-slate-50 px-5 py-2 text-xs font-medium text-slate-500">
-          Switch Demo Mode to act as {copy.label}
-        </p>
-      ) : null}
 
-      {isWaitingForOtherParty ? (
-        <p className="bg-emerald-50 px-5 py-2 text-xs font-medium text-emerald-700">
-          Your current tasks are complete. Waiting for the other party.
-        </p>
-      ) : null}
+        {!isActive && activeDemoRole !== "rto" ? (
+          <span className="border border-[#d9d0c7] bg-[#f8f3ee] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8a7d72]">
+            Locked
+          </span>
+        ) : null}
+      </div>
 
-      <div className="space-y-3 p-4">
-        {visibleTasks.map(({ task, status }) => (
+      <p className="mt-1 text-xs leading-5 text-[#7b7169]">
+        {copy.heading}
+      </p>
+    </header>
+
+    {/* Role lock */}
+    {!isActive && activeDemoRole !== "rto" ? (
+      <div className="border-b border-[#e5ddd5] bg-[#f8f3ee] px-4 py-2.5">
+        <p className="text-xs font-medium text-[#6b635d]">
+          Acting as{" "}
+          <span className="font-semibold text-[#24201d]">
+            {activeDemoRole}
+          </span>
+          . {copy.label} actions are locked.
+        </p>
+      </div>
+    ) : null}
+
+    {/* Waiting state */}
+    {isWaitingForOtherParty ? (
+      <div className="border-b border-[#d8e5d9] bg-[#eef5ef] px-4 py-3">
+        <p className="text-xs font-semibold text-[#56715a]">
+          Your tasks are complete.
+        </p>
+
+        <p className="mt-0.5 text-xs text-[#6b635d]">
+          Waiting for the other party to continue.
+        </p>
+      </div>
+    ) : null}
+
+    {/* Tasks */}
+    <div className="divide-y divide-[#e5ddd5]">
+      {visibleTasks.map(({ task, status }) => (
+        <div
+          key={task.id}
+          className="px-4 py-3"
+        >
           <TaskCard
-            key={task.id}
             task={task}
             status={status}
             onAction={
-              onTaskAction ? () => onTaskAction(task) : undefined
+              onTaskAction && isActive
+                ? () => onTaskAction(task)
+                : undefined
             }
           />
-        ))}
-      </div>
-    </section>
-  );
-}
+        </div>
+      ))}
+    </div>
+  </section>
+);}

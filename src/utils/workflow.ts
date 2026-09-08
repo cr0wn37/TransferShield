@@ -60,50 +60,109 @@ export function getStatusLabel(status: TransferStatus): string {
   return WORKFLOW_STAGES[status].label;
 }
 
-export function getActionRequired(transfer: Transfer): ActionRequired {
+export function getActionRequired(
+  transfer: Transfer,
+): ActionRequired | null {
   if (transfer.status === "ACTION_REQUIRED") {
-    return {
-      role: transfer.rto.responsibleParty ?? "rto",
-      title: "Correction needed before RTO review can continue",
-      description:
-        transfer.rto.requiredAction ??
-        transfer.rto.message ??
-        "Review the requested correction and submit the updated information.",
-      actionLabel: "Review correction",
-    };
+    const openCorrections =
+      transfer.rto.corrections?.filter(
+        (correction) =>
+          correction.status === "open",
+      ) ?? [];
+
+    if (openCorrections.length > 0) {
+      const correction =
+        openCorrections[0];
+
+      const correctionDocument =
+        transfer.documents.find(
+          (document) =>
+            document.id ===
+            correction.documentId,
+        );
+
+      return {
+        role:
+          correction.responsibleParty,
+
+        title:
+          `${
+            correction.responsibleParty ===
+            "seller"
+              ? "Seller"
+              : "Buyer"
+          } action required`,
+
+        description:
+          correction.message ??
+          `Upload ${
+            correctionDocument?.label ??
+            "the requested document"
+          } again and resubmit the application.`,
+
+        actionLabel:
+          "Review correction",
+      };
+    }
+
+    // All requested corrections have been resolved.
+    // Do not return the old ACTION_REQUIRED banner.
+    return null;
   }
 
-  const buyerDetailsTask = transfer.tasks.find(
-  (task) => task.id === "buyer-confirm-details",
-);
+  const buyerDetailsTask =
+    transfer.tasks.find(
+      (task) =>
+        task.id ===
+        "buyer-confirm-details",
+    );
 
-const sellerDetailsTask = transfer.tasks.find(
-  (task) => task.id === "seller-confirm-details",
-);
+  const sellerDetailsTask =
+    transfer.tasks.find(
+      (task) =>
+        task.id ===
+        "seller-confirm-details",
+    );
 
-if (transfer.status === "BUYER_JOINED") {
-  if (buyerDetailsTask?.status !== "completed") {
-    return {
-      role: "buyer",
-      title: "Buyer needs to confirm details",
-      description:
-        "The buyer must review and confirm their transfer details before payment can begin.",
-      actionLabel: "Confirm details",
-    };
+  if (
+    transfer.status ===
+    "BUYER_JOINED"
+  ) {
+    if (
+      buyerDetailsTask?.status !==
+      "completed"
+    ) {
+      return {
+        role: "buyer",
+        title:
+          "Buyer needs to confirm details",
+        description:
+          "The buyer must review and confirm their transfer details before payment can begin.",
+        actionLabel:
+          "Confirm details",
+      };
+    }
+
+    if (
+      sellerDetailsTask?.status !==
+      "completed"
+    ) {
+      return {
+        role: "seller",
+        title:
+          "Seller needs to confirm details",
+        description:
+          "The seller must review and confirm their transfer details before payment can begin.",
+        actionLabel:
+          "Confirm details",
+      };
+    }
   }
 
-  if (sellerDetailsTask?.status !== "completed") {
-    return {
-      role: "seller",
-      title: "Seller needs to confirm details",
-      description:
-        "The seller must review and confirm their transfer details before payment can begin.",
-      actionLabel: "Confirm details",
-    };
-  }
-}
-
-  const actions: Record<TransferStatus, ActionRequired> = {
+  const actions: Record<
+    TransferStatus,
+    ActionRequired
+  > = {
     INITIATED: {
       role: "seller",
       title: "Invite the buyer",
@@ -230,39 +289,89 @@ export function getDerivedTaskStatus(
   transfer: Transfer,
   taskId: string,
 ): TaskStatus {
-  const task = transfer.tasks.find((item) => item.id === taskId);
+  const task = transfer.tasks.find(
+    (item) => item.id === taskId,
+  );
 
   if (!task) {
     return "locked";
   }
 
-  if (
-    transfer.status === "ACTION_REQUIRED" &&
-    transfer.rto.requestedDocumentId
-  ) {
-    const rejectedDocument = transfer.documents.find(
-      (document) => document.id === transfer.rto.requestedDocumentId,
-    );
+  /*
+   * RTO corrections are party-specific.
+   *
+   * Check the actual corrections array instead of relying
+   * on legacy requestedDocumentId, because multiple
+   * corrections can exist at the same time.
+   */
+  if (transfer.status === "ACTION_REQUIRED") {
+    const openCorrections =
+      transfer.rto.corrections?.filter(
+        (correction) =>
+          correction.status === "open",
+      ) ?? [];
 
-    if (rejectedDocument) {
-      const affectedTaskId =
-        rejectedDocument.owner === "buyer"
-          ? "buyer-esign"
-          : rejectedDocument.owner === "seller"
-            ? "seller-esign"
-            : undefined;
+    const affectedByCorrection =
+      openCorrections.some((correction) => {
+        const document = transfer.documents.find(
+          (item) =>
+            item.id === correction.documentId,
+        );
 
-      if (task.id === affectedTaskId) {
-        return "blocked";
-      }
+        if (!document) {
+          return false;
+        }
+
+        const affectedTaskId =
+          document.owner === "buyer"
+            ? "buyer-esign"
+            : document.owner === "seller"
+              ? "seller-esign"
+              : undefined;
+
+        return (
+          affectedTaskId === taskId
+        );
+      });
+
+    if (affectedByCorrection) {
+      return "blocked";
+    }
+
+    /*
+     * If all corrections have been resolved,
+     * the original completed task remains completed.
+     */
+    const allCorrectionsResolved =
+      openCorrections.length === 0 &&
+      (transfer.rto.corrections?.length ?? 0) > 0 &&
+      transfer.rto.corrections!.every(
+        (correction) =>
+          correction.status === "resolved",
+      );
+
+    if (
+      allCorrectionsResolved &&
+      (
+        taskId === "buyer-esign" ||
+        taskId === "seller-esign"
+      )
+    ) {
+      return "completed";
     }
   }
 
-  if (task.status === "completed" || task.status === "blocked") {
+  if (
+    task.status === "completed" ||
+    task.status === "blocked"
+  ) {
     return task.status;
   }
 
-  return isTaskLocked(transfer, task.prerequisiteTaskIds)
+  return isTaskLocked(
+    transfer,
+    task.prerequisiteTaskIds,
+  )
     ? "locked"
     : "pending";
 }

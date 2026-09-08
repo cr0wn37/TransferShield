@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import type { TimelineEvent } from "../../types/transfer";
+import { TimelineIntegrityBadge } from "../TimelineIntegrityBadge";
 
 interface AuditTimelineProps {
   events: TimelineEvent[];
@@ -28,19 +29,19 @@ const actorLabels: Record<TimelineEvent["actor"], string> = {
 const eventStyles = {
   success: {
     icon: CheckCircle2,
-    iconClassName: "bg-emerald-100 text-emerald-700",
+    iconClassName: "border-[#cdddcf] bg-[#f4f8f4] text-[#5d7c60]",
   },
   info: {
     icon: Info,
-    iconClassName: "bg-blue-100 text-blue-700",
+    iconClassName: "border-[#d9d0c7] bg-[#f8f3ee] text-[#8a7d72]",
   },
   warning: {
     icon: CircleAlert,
-    iconClassName: "bg-amber-100 text-amber-700",
+    iconClassName: "border-[#e3cfaa] bg-[#fbf3e3] text-[#8c6427]",
   },
   error: {
     icon: CircleAlert,
-    iconClassName: "bg-rose-100 text-rose-700",
+    iconClassName: "border-[#d9b5b5] bg-[#fbefef] text-[#9a4f4f]",
   },
 };
 
@@ -67,111 +68,147 @@ export function AuditTimeline({ events }: AuditTimelineProps) {
       : newestFirstEvents.slice(0, INITIAL_VISIBLE_EVENTS);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-500">
-            Transfer history
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-slate-900">
-            Audit timeline
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            A record of every important action in this ownership transfer.
-          </p>
-        </div>
+    <section
+      aria-label="Audit timeline"
+      className="border border-[#d9d0c7] bg-[#fffdf9]"
+    >
+      {/* Header */}
+      <div className="border-b border-[#e5ddd5] px-5 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#b56f52]">
+              Transfer history
+            </p>
 
-        {hasMoreEvents ? (
-          <button
-            type="button"
-            aria-controls="audit-timeline-events"
-            aria-expanded={isExpanded}
-            onClick={() => setIsExpanded((currentValue) => !currentValue)}
-            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            {isExpanded
-              ? "Hide full history"
-              : `View full history (${events.length} events)`}
-            {isExpanded ? (
-              <ChevronUp aria-hidden="true" className="h-4 w-4" />
-            ) : (
-              <ChevronDown aria-hidden="true" className="h-4 w-4" />
-            )}
-          </button>
-        ) : null}
+            <div className="mt-1.5 flex flex-wrap items-center gap-3">
+              <h2 className="text-lg font-bold tracking-tight text-[#24201d]">
+                Audit timeline
+              </h2>
+
+              <TimelineIntegrityBadge events={events} />
+            </div>
+
+            <p className="mt-1.5 text-xs leading-5 text-[#6b635d]">
+              A record of every important action in this ownership transfer.
+            </p>
+          </div>
+
+          {hasMoreEvents ? (
+            <button
+              type="button"
+              aria-controls="audit-timeline-events"
+              aria-expanded={isExpanded}
+              onClick={() => setIsExpanded((currentValue) => !currentValue)}
+              className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 border border-[#d9d0c7] bg-[#fffdf9] px-3 py-2 text-xs font-semibold text-[#6b635d] transition hover:bg-[#f8f3ee] hover:text-[#24201d]"
+            >
+              {isExpanded
+                ? "Hide full history"
+                : `View full history (${events.length} events)`}
+
+              {isExpanded ? (
+                <ChevronUp aria-hidden="true" className="h-4 w-4" />
+              ) : (
+                <ChevronDown aria-hidden="true" className="h-4 w-4" />
+              )}
+            </button>
+          ) : null}
+        </div>
       </div>
 
+      {/* Empty state */}
       {events.length === 0 ? (
-        <div className="mt-6 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
-          No activity has been recorded yet.
+        <div className="px-5 py-5 sm:px-6">
+          <div className="border border-[#e1d8d1] bg-[#f8f3ee] px-4 py-3">
+            <p className="text-sm font-semibold text-[#24201d]">
+              No activity recorded
+            </p>
+
+            <p className="mt-1 text-xs leading-5 text-[#8a7d72]">
+              Important actions will appear here as the transfer progresses.
+            </p>
+          </div>
         </div>
       ) : (
-        <ol id="audit-timeline-events" className="mt-6 space-y-0">
-          {visibleEvents.map((event, index) => {
-            const style = eventStyles[event.status ?? "info"];
-            const StatusIcon = style.icon;
-            const ActorIcon = getActorIcon(event.actor);
-            const isLastVisibleEvent =
-              index === visibleEvents.length - 1;
+        <>
+          {/* Event list */}
+          <ol id="audit-timeline-events" className="px-5 py-5 sm:px-6">
+            {visibleEvents.map((event, index) => {
+              const style = eventStyles[event.status ?? "info"];
+              const StatusIcon = style.icon;
+              const ActorIcon = getActorIcon(event.actor);
 
-            return (
-              <li
-                key={event.id}
-                className="relative flex gap-4 pb-6 last:pb-0"
-              >
-                {!isLastVisibleEvent ? (
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-5 top-10 h-[calc(100%-1.5rem)] w-px bg-slate-200"
-                  />
-                ) : null}
+              const isLastVisibleEvent =
+                index === visibleEvents.length - 1;
 
-                <div
-                  className={`z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${style.iconClassName}`}
+              return (
+                <li
+                  key={event.id}
+                  className="relative flex gap-4 pb-6 last:pb-0"
                 >
-                  <StatusIcon
-                    aria-hidden="true"
-                    className="h-5 w-5"
-                  />
-                </div>
+                  {/* Timeline connector */}
+                  {!isLastVisibleEvent ? (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-[15px] top-8 h-[calc(100%-0.5rem)] w-px bg-[#e1d8d1]"
+                    />
+                  ) : null}
 
-                <div className="min-w-0 flex-1 pt-0.5">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                    <p className="font-semibold text-slate-900">
-                      {event.title}
-                    </p>
-
-                    <time
-                      dateTime={event.timestamp}
-                      className="shrink-0 text-xs text-slate-500"
-                    >
-                      {formatTimestamp(event.timestamp)}
-                    </time>
+                  {/* Event marker */}
+                  <div
+                    className={`z-10 flex h-8 w-8 shrink-0 items-center justify-center border ${style.iconClassName}`}
+                  >
+                    <StatusIcon
+                      aria-hidden="true"
+                      className="h-4 w-4"
+                    />
                   </div>
 
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {event.description}
-                  </p>
+                  {/* Event content */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#24201d]">
+                          {event.title}
+                        </p>
 
-                  <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    <ActorIcon
-                      aria-hidden="true"
-                      className="h-3.5 w-3.5"
-                    />
-                    {actorLabels[event.actor]}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+                        <p className="mt-1 text-xs leading-5 text-[#6b635d] sm:text-sm">
+                          {event.description}
+                        </p>
+                      </div>
+
+                      <time
+                        dateTime={event.timestamp}
+                        className="shrink-0 text-[10px] font-medium text-[#8a7d72] sm:pt-0.5 sm:text-right"
+                      >
+                        {formatTimestamp(event.timestamp)}
+                      </time>
+                    </div>
+
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <ActorIcon
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 text-[#8a7d72]"
+                      />
+
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#8a7d72]">
+                        {actorLabels[event.actor]}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+
+          {!isExpanded && hasMoreEvents ? (
+            <div className="border-t border-[#e5ddd5] bg-[#f8f3ee] px-5 py-3 sm:px-6">
+              <p className="text-[11px] text-[#8a7d72]">
+                Showing the latest {INITIAL_VISIBLE_EVENTS} events.
+              </p>
+            </div>
+          ) : null}
+        </>
       )}
-
-      {!isExpanded && hasMoreEvents ? (
-        <p className="mt-5 text-sm text-slate-500">
-          Showing the latest {INITIAL_VISIBLE_EVENTS} events.
-        </p>
-      ) : null}
     </section>
   );
 }
