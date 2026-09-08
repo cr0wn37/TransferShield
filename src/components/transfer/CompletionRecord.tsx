@@ -1,9 +1,8 @@
 import {
   CheckCircle2,
-  FileCheck2,
+  
   Landmark,
-  Printer,
-  ShieldCheck,
+
 } from "lucide-react";
 import { FileDown } from "lucide-react";
 import { generateTransferCompletionCertificate } from "../../lib/generateTransferCompletionCertificate";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, CheckCircle2, Search, CarFront,FileCheck2,Landmark,UserRound,ShieldCheck, Users,FileText,
-  Zap,} from "lucide-react";
+import { ArrowRight, Search, CarFront,
+  } from "lucide-react";
 import {
   Link,
   useLocation,

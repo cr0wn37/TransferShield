@@ -30,7 +30,7 @@ interface DigitalHandoverDialogProps {
   vehicleNumber: string;
 }
 
-type Step = "details" | "payment" | "confirmation" | "issued";
+
 
 const HANDOVER_FEE = 149;
 
@@ -1266,7 +1266,6 @@ const PartyConfirmationCard: React.FC<
   role,
   name,
   confirmed,
-  onConfirm,
   otpSent,
   otp,
   onSendOtp,

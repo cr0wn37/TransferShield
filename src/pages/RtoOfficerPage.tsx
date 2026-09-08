@@ -4,7 +4,7 @@ import {
   ArrowRight,
   CheckCircle2,
   CircleAlert,
-  FileText,
+  
   Landmark,
 } from "lucide-react";
 import { Link } from "react-router-dom";
